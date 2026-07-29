@@ -1,0 +1,10 @@
+.git
+.github
+*.md
+*.py
+node_modules
+web/node_modules
+web/dist
+data/
+*.db
+*.log

@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-base: #0a0e1a;
+    --color-surface: #111827;
+    --color-elevated: #1e293b;
+    --color-accent: #06d6a0;
+    --color-accent-hover: #05b88a;
+    --color-accent-dim: rgba(6, 214, 160, 0.15);
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-border: rgba(30, 41, 59, 0.6);
+  }
+
+  body {
+    background-color: var(--color-base);
+    color: var(--color-text-primary);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #334155 #0f172a;
+  }
+
+  *::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #334155;
+    border-radius: 3px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: #475569;
+  }
+
+  /* Focus ring override for inputs */
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+  }
+
+  /* Checkbox accent color */
+  input[type="checkbox"] {
+    accent-color: var(--color-accent);
+  }
+
+  /* Smooth transitions for interactive elements */
+  a, button, input, select, [role="switch"] {
+    transition: all 150ms ease;
+  }
+}
+
+@layer components {
+  .truncate-wide {
+    @apply truncate;
+    max-width: 100%;
+  }
+
+  .size-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium;
+  }
+
+  .size-badge-large {
+    @apply size-badge bg-danger/15 text-danger;
+  }
+
+  .size-badge-medium {
+    @apply size-badge bg-warning/15 text-warning;
+  }
+
+  .size-badge-small {
+    @apply size-badge bg-accent/15 text-accent;
+  }
+
+  /* Card with subtle glass effect */
+  .card-glass {
+    @apply bg-white/[0.02] backdrop-blur-sm border border-white/[0.06] rounded-lg;
+  }
+
+  /* Monospace data styling */
+  .data-value {
+    @apply font-mono font-medium tabular-nums;
+  }
+
+  /* Status pulse animation for running jobs */
+  .status-pulse {
+    animation: pulse-soft 2s ease-in-out infinite;
+  }
+}
+
+@layer utilities {
+  .transition-base {
+    @apply transition-all duration-150 ease-out;
+  }
+}

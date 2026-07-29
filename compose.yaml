@@ -1,0 +1,29 @@
+services:
+  mediacrunch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mediacrunch
+    ports:
+      - "8970:8080"
+    volumes:
+      - mediacrunch_data:/app/data
+      # Arr stacks — rw needed for compression (in-place overwrite)
+      - /etc/komodo/stacks/arr:/data/arr:rw
+      # Plex data — rw needed for compression (in-place overwrite)
+      - /etc/komodo/stacks/plex:/data/plex:rw
+    environment:
+      - MC_DATA_DIR=/app/data
+      - MC_PORT=8080
+      - MC_QUALITY_DEFAULT=80
+      - MC_MAX_WIDTH_DEFAULT=1920
+      - MC_MIN_SAVING_KB=50
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  mediacrunch_data:
