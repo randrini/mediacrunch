@@ -164,9 +164,6 @@ jobs:
             type=semver,pattern={{major}}
             type=sha
 
-      - name: Debug digests
-        run: ls -la /tmp/digests/
-
       - name: Create manifest list and push
         run: |
           # Digest file names ARE the sha256 hashes (created via touch)
