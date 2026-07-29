@@ -165,11 +165,15 @@ jobs:
             type=sha
 
       - name: Create manifest list and push
-        working-directory: /tmp/digests
         run: |
+          # Collect all digest files and create multi-arch manifest
+          DIGESTS=""
+          for f in /tmp/digests/digest-*/*; do
+            DIGESTS="$DIGESTS ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:$(cat $f)"
+          done
           docker buildx imagetools create \
             -t ${{ steps.meta.outputs.tags }} \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:$(cat *)
+            $DIGESTS
 
       - name: Inspect image
         run: |
