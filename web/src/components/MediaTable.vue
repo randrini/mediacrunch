@@ -61,14 +61,14 @@
               <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Images</th>
               <th
                 class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-200"
-                @click="sortBy('total_size')"
+                @click="sortBy('original_size')"
               >
                 <span class="inline-flex items-center">
                   Size
-                  <svg v-if="sortField === 'total_size' && sortOrder === 'desc'" class="w-3 h-3 ml-1 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <svg v-if="sortField === 'original_size' && sortOrder === 'asc'" class="w-3 h-3 ml-1 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
                   </svg>
-                  <svg v-else-if="sortField === 'total_size'" class="w-3 h-3 ml-1 text-accent rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <svg v-else-if="sortField === 'original_size'" class="w-3 h-3 ml-1 text-accent rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
                   </svg>
                   <svg v-else class="w-3 h-3 ml-1 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -78,14 +78,14 @@
               </th>
               <th
                 class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-200"
-                @click="sortBy('original_size')"
+                @click="sortBy('total_size')"
               >
                 <span class="inline-flex items-center">
-                  Before
-                  <svg v-if="sortField === 'original_size' && sortOrder === 'desc'" class="w-3 h-3 ml-1 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  After
+                  <svg v-if="sortField === 'total_size' && sortOrder === 'asc'" class="w-3 h-3 ml-1 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
                   </svg>
-                  <svg v-else-if="sortField === 'original_size'" class="w-3 h-3 ml-1 text-accent rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <svg v-else-if="sortField === 'total_size'" class="w-3 h-3 ml-1 text-accent rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
                   </svg>
                   <svg v-else class="w-3 h-3 ml-1 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

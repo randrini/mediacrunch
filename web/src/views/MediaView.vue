@@ -323,17 +323,6 @@ async function startCompression() {
   try {
     await compressState.startCompression(instanceId.value, compressTargetIds.value, config)
     showCompressModal.value = false
-    // Refresh data when job completes
-    const checkComplete = setInterval(() => {
-      const job = compressState.currentJob
-      if (job && (job.status === 'completed' || job.status === 'failed' || job.status === 'cancelled')) {
-        clearInterval(checkComplete)
-        mediaStore.fetchItems(instanceId.value)
-        loadStats()
-      }
-    }, 2000)
-    // Safety: stop checking after 10 minutes
-    setTimeout(() => clearInterval(checkComplete), 600000)
   } catch {
     // error handled by composable
   }
@@ -370,6 +359,16 @@ onMounted(async () => {
   await loadStats()
   // Resume polling for any running compression job for this instance
   compressState.resumeRunningJob(instanceId.value)
+})
+
+// Watch for compression job completion to refresh data
+watch(() => compressState.currentJob?.status, (newStatus, oldStatus) => {
+  if (oldStatus === 'running' || oldStatus === 'pending') {
+    if (newStatus === 'completed' || newStatus === 'failed' || newStatus === 'cancelled') {
+      mediaStore.fetchItems(instanceId.value)
+      loadStats()
+    }
+  }
 })
 
 watch(instanceId, async () => {

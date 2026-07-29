@@ -59,6 +59,10 @@ func (h *MediaHandler) ListMedia(c *gin.Context) {
 	}
 
 	// Validate sort field and map to SQL expression
+	validSorts := map[string]bool{"total_size": true, "original_size": true, "title": true, "year": true, "total_images": true}
+	if !validSorts[sort] {
+		sort = "total_size"
+	}
 	// original_size is 0 for uncompressed items, so fall back to total_size for sorting
 	sortExpr := sort
 	if sort == "original_size" {
