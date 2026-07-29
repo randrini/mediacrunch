@@ -58,10 +58,11 @@ func (h *MediaHandler) ListMedia(c *gin.Context) {
 		return
 	}
 
-	// Validate sort field
-	validSorts := map[string]bool{"total_size": true, "original_size": true, "title": true, "year": true, "total_images": true}
-	if !validSorts[sort] {
-		sort = "total_size"
+	// Validate sort field and map to SQL expression
+	// original_size is 0 for uncompressed items, so fall back to total_size for sorting
+	sortExpr := sort
+	if sort == "original_size" {
+		sortExpr = "COALESCE(NULLIF(original_size, 0), total_size)"
 	}
 
 	// Validate order
@@ -117,7 +118,7 @@ func (h *MediaHandler) ListMedia(c *gin.Context) {
 
 	query := fmt.Sprintf(`
 		SELECT %s FROM media_items WHERE %s ORDER BY %s %s LIMIT ? OFFSET ?
-	`, selectCols, whereClause, sort, order)
+	`, selectCols, whereClause, sortExpr, order)
 
 	args = append(args, perPage, offset)
 	rows, err := h.DB.Query(query, args...)
