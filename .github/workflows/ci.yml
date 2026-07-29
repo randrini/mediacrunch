@@ -46,11 +46,20 @@ jobs:
       - name: Test backend
         run: go test ./...
 
-  # ── Docker Build & Push (multi-platform) ──────────────────────────────────────
-  docker:
+  # ── Docker Build (native per-platform) ────────────────────────────────────────
+  docker-build:
     needs: build
     if: github.event_name == 'push'
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+            suffix: amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            suffix: arm64
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
 
@@ -71,16 +80,12 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           flavor: |
-            latest=auto
+            latest=false
           tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+            type=semver,pattern={{version}}-${{ matrix.suffix }}
+            type=semver,pattern={{major}}.{{minor}}-${{ matrix.suffix }}
+            type=sha,prefix=sha-${{ matrix.suffix }}-
+            type=raw,value=${{ github.ref_name == 'main' && 'main' || '' }}-${{ matrix.suffix }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -92,24 +97,87 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push by digest
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
           build-args: |
             VERSION=${{ steps.version.outputs.VERSION }}
             COMMIT=${{ steps.version.outputs.COMMIT }}
             BUILD_DATE=${{ steps.version.outputs.BUILD_DATE }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.suffix }}
+          cache-to: type=gha,scope=${{ matrix.suffix }},mode=max
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ matrix.suffix }}
+          path: /tmp/digests/
+          if-no-files-found: error
+          retention-days: 1
+
+  # ── Docker Manifest (merge platforms) ─────────────────────────────────────────
+  docker-manifest:
+    needs: docker-build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digest-*
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          flavor: |
+            latest=${{ startsWith(github.ref, 'refs/tags/v') }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create \
+            -t ${{ steps.meta.outputs.tags }} \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:$(cat *)
+
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
 
   # ── GitHub Release ────────────────────────────────────────────────────────────
   release:
-    needs: docker
+    needs: docker-manifest
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
@@ -151,6 +219,6 @@ jobs:
             ```
 
             ## Multi-architecture
-            This image supports both `linux/amd64` and `linux/arm64`.
+            This image supports both `linux/amd64` and `linux/arm64`, built on native runners.
           draft: false
           prerelease: ${{ contains(github.ref_name, 'rc') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
