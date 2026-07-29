@@ -1,8 +1,6 @@
 services:
   mediacrunch:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/randrini/mediacrunch:latest
     container_name: mediacrunch
     ports:
       - "8970:8080"
