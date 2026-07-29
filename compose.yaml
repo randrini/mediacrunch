@@ -1,6 +1,6 @@
 services:
   mediacrunch:
-    image: ghcr.io/randrini/mediacrunch:latest
+    image: ghcr.io/randrini/mediacrunch:main
     container_name: mediacrunch
     ports:
       - "8970:8080"
