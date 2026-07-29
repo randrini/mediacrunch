@@ -121,7 +121,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: digest-${{ matrix.suffix }}
-          path: /tmp/digests/
+          path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
 
@@ -164,6 +164,9 @@ jobs:
             type=semver,pattern={{major}}
             type=sha
 
+      - name: Debug digests
+        run: ls -la /tmp/digests/
+
       - name: Create manifest list and push
         run: |
           # Digest file names ARE the sha256 hashes (created via touch)
@@ -173,6 +176,7 @@ jobs:
             hash="$(basename "$f")"
             DIGESTS="$DIGESTS ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:$hash"
           done
+          echo "DIGESTS=$DIGESTS"
           docker buildx imagetools create \
             -t ${{ steps.meta.outputs.tags }} \
             $DIGESTS
