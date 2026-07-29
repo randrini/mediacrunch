@@ -176,9 +176,13 @@ jobs:
             hash="$(basename "$f")"
             DIGESTS="$DIGESTS ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:$hash"
           done
-          echo "DIGESTS=$DIGESTS"
+          # Build -t flags from multi-line tags output
+          TAGS=""
+          while IFS= read -r tag; do
+            TAGS="$TAGS -t $tag"
+          done <<< "${{ steps.meta.outputs.tags }}"
           docker buildx imagetools create \
-            -t ${{ steps.meta.outputs.tags }} \
+            $TAGS \
             $DIGESTS
 
       - name: Inspect image
