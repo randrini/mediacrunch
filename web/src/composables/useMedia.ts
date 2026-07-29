@@ -12,6 +12,7 @@ export const useMediaStore = defineStore('media', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
   const selectedIds = ref<Set<string>>(new Set())
+  const lastSelectedId = ref<string | null>(null)
 
   const filters = ref<MediaQueryParams>({
     type: undefined,
@@ -79,8 +80,22 @@ export const useMediaStore = defineStore('media', () => {
   function toggleSelect(id: string) {
     if (selectedIds.value.has(id)) {
       selectedIds.value.delete(id)
+      lastSelectedId.value = null
     } else {
       selectedIds.value.add(id)
+      lastSelectedId.value = id
+    }
+  }
+
+  function selectRange(fromId: string, toId: string) {
+    const ids = items.value.map((i) => i.id)
+    const fromIdx = ids.indexOf(fromId)
+    const toIdx = ids.indexOf(toId)
+    if (fromIdx === -1 || toIdx === -1) return
+    const start = Math.min(fromIdx, toIdx)
+    const end = Math.max(fromIdx, toIdx)
+    for (let i = start; i <= end; i++) {
+      selectedIds.value.add(ids[i])
     }
   }
 
@@ -101,6 +116,7 @@ export const useMediaStore = defineStore('media', () => {
     loading,
     error,
     selectedIds,
+    lastSelectedId,
     filters,
     selectedItems,
     fetchItems,
@@ -108,6 +124,7 @@ export const useMediaStore = defineStore('media', () => {
     setFilter,
     resetFilters,
     toggleSelect,
+    selectRange,
     selectAll,
     deselectAll,
   }

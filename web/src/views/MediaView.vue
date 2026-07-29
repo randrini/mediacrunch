@@ -97,6 +97,7 @@
       :instance-id="instanceId"
       :instance-type="instance?.type || ''"
       :selected-ids="[...mediaStore.selectedIds]"
+      :last-selected-id="mediaStore.lastSelectedId"
       :current-page="mediaStore.page"
       :total-pages="mediaStore.totalPages"
       :total="mediaStore.total"
@@ -106,6 +107,7 @@
       @select-all="mediaStore.selectAll()"
       @deselect-all="mediaStore.deselectAll()"
       @toggle-select="mediaStore.toggleSelect"
+      @select-range="(fromId: string, toId: string) => mediaStore.selectRange(fromId, toId)"
       @page-change="handlePageChange"
       @sort="handleSort"
     />

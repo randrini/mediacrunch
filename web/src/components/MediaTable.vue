@@ -127,7 +127,7 @@
                 <input
                   type="checkbox"
                   :checked="selectedIds.includes(item.id)"
-                  @change="toggleItem(item.id)"
+                  @click="onRowCheck(item, $event)"
                   class="rounded border-white/[0.08] bg-elevated text-accent focus:ring-accent/50"
                 />
               </td>
@@ -262,6 +262,7 @@ const props = defineProps<{
   instanceId: string
   instanceType: string
   selectedIds: string[]
+  lastSelectedId: string | null
   currentPage: number
   totalPages: number
   total: number
@@ -274,6 +275,7 @@ const emit = defineEmits<{
   selectAll: []
   deselectAll: []
   toggleSelect: [id: string]
+  selectRange: [fromId: string, toId: string]
   pageChange: [page: number]
   sort: [field: string, order: 'asc' | 'desc']
 }>()
@@ -304,8 +306,13 @@ function onSelectAll() {
   }
 }
 
-function toggleItem(id: string) {
-  emit('toggleSelect', id)
+function onRowCheck(item: MediaItem, event: MouseEvent) {
+  if (event.shiftKey && props.lastSelectedId) {
+    event.preventDefault()
+    emit('selectRange', props.lastSelectedId, item.id)
+  } else {
+    emit('toggleSelect', item.id)
+  }
 }
 
 function sortBy(field: string) {
