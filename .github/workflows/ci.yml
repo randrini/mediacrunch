@@ -166,10 +166,12 @@ jobs:
 
       - name: Create manifest list and push
         run: |
-          # Collect all digest files and create multi-arch manifest
+          # Digest file names ARE the sha256 hashes (created via touch)
           DIGESTS=""
-          for f in /tmp/digests/digest-*/*; do
-            DIGESTS="$DIGESTS ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:$(cat $f)"
+          for f in /tmp/digests/*; do
+            [ -f "$f" ] || continue
+            hash="$(basename "$f")"
+            DIGESTS="$DIGESTS ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:$hash"
           done
           docker buildx imagetools create \
             -t ${{ steps.meta.outputs.tags }} \
