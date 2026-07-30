@@ -179,6 +179,20 @@ func (c *Compressor) compressSingleImage(job *models.CompressionJob, item models
 		CreatedAt:     time.Now(),
 	}
 
+	// Check minimum size threshold for this role
+	// If the original file is already very small, skip compression to avoid quality degradation
+	minSizeBytes := job.Config.MinSizeKB["default"] * 1024
+	if ms, ok := job.Config.MinSizeKB[img.Role]; ok {
+		minSizeBytes = ms * 1024
+	}
+	if minSizeBytes > 0 && img.SizeBytes < minSizeBytes {
+		result.Status = "skipped"
+		result.SkipReason = fmt.Sprintf("original size %s below minimum %s threshold for %s", models.FormatSize(img.SizeBytes), models.FormatSize(minSizeBytes), img.Role)
+		result.NewBytes = img.SizeBytes
+		result.SavedBytes = 0
+		return result
+	}
+
 	// Open the source image
 	srcImg, err := imaging.Open(img.Path)
 	if err != nil {

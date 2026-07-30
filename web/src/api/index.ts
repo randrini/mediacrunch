@@ -102,8 +102,9 @@ export interface CompressRequest {
   media_item_ids?: string[] | null
   quality?: Record<string, number>
   max_width?: Record<string, number>
-  backup?: boolean
   min_saving_kb?: number
+  min_size_kb?: Record<string, number>
+  backup?: boolean
   lock_plex?: boolean
 }
 

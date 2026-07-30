@@ -9,11 +9,12 @@ import (
 // InstanceSettings holds per-instance compression defaults.
 // Pointer types distinguish "not set" (nil) from "set to zero value".
 type InstanceSettings struct {
-	Quality     map[string]int `json:"quality,omitempty"`
-	MaxWidth    map[string]int `json:"max_width,omitempty"`
-	Backup      *bool          `json:"backup,omitempty"`
-	MinSavingKB *int64         `json:"min_saving_kb,omitempty"`
-	LockPlex    *bool          `json:"lock_plex,omitempty"`
+	Quality     map[string]int   `json:"quality,omitempty"`
+	MaxWidth    map[string]int   `json:"max_width,omitempty"`
+	MinSizeKB   map[string]int64 `json:"min_size_kb,omitempty"`
+	Backup      *bool            `json:"backup,omitempty"`
+	MinSavingKB *int64           `json:"min_saving_kb,omitempty"`
+	LockPlex    *bool            `json:"lock_plex,omitempty"`
 }
 
 // Instance represents a connected Radarr, Sonarr, or Plex instance.
@@ -141,11 +142,12 @@ type CompressionJob struct {
 
 // JobConfig holds the per-job compression settings.
 type JobConfig struct {
-	Quality     map[string]int `json:"quality,omitempty"`
-	MaxWidth    map[string]int `json:"max_width,omitempty"`
-	Backup      bool           `json:"backup"`
-	MinSavingKB int64          `json:"min_saving_kb"`
-	LockPlex    bool           `json:"lock_plex"`
+	Quality     map[string]int   `json:"quality,omitempty"`
+	MaxWidth    map[string]int   `json:"max_width,omitempty"`
+	MinSizeKB   map[string]int64 `json:"min_size_kb,omitempty"`
+	Backup      bool             `json:"backup"`
+	MinSavingKB int64            `json:"min_saving_kb"`
+	LockPlex    bool             `json:"lock_plex"`
 }
 
 // UnmarshalConfig parses the config JSON column.

@@ -48,6 +48,7 @@ func (h *CompressHandler) StartCompression(c *gin.Context) {
 		MediaItemIDs []string       `json:"media_item_ids"`
 		Quality      map[string]int `json:"quality"`
 		MaxWidth     map[string]int `json:"max_width"`
+		MinSizeKB    map[string]int64 `json:"min_size_kb"`
 		Backup       bool           `json:"backup"`
 		MinSavingKB  int64          `json:"min_saving_kb"`
 		LockPlex     bool           `json:"lock_plex"`
@@ -80,6 +81,7 @@ func (h *CompressHandler) StartCompression(c *gin.Context) {
 	config := models.JobConfig{
 		Quality:     input.Quality,
 		MaxWidth:    input.MaxWidth,
+		MinSizeKB:   input.MinSizeKB,
 		Backup:      input.Backup,
 		MinSavingKB: input.MinSavingKB,
 		LockPlex:    input.LockPlex,
@@ -352,6 +354,7 @@ func mergeSettings(req models.JobConfig, instSettings models.InstanceSettings) m
 	out := models.JobConfig{
 		Quality:  make(map[string]int),
 		MaxWidth: make(map[string]int),
+		MinSizeKB: make(map[string]int64),
 	}
 
 	// Determine all role keys from both request and instance settings
@@ -365,14 +368,26 @@ func mergeSettings(req models.JobConfig, instSettings models.InstanceSettings) m
 	// Ensure "default" is always present
 	allQualityKeys["default"] = true
 
+	// Better per-role quality defaults
+	defaultQuality := map[string]int{
+		"default":       82,
+		"poster":        82,
+		"fanart":        82,
+		"season_poster": 82,
+		"banner":        85,
+		"clearLogo":     90, // PNG preserved, but if converted, use higher quality
+	}
+
 	for k := range allQualityKeys {
 		switch {
 		case req.Quality != nil && req.Quality[k] != 0:
 			out.Quality[k] = req.Quality[k]
 		case instSettings.Quality != nil && instSettings.Quality[k] != 0:
 			out.Quality[k] = instSettings.Quality[k]
+		case defaultQuality[k] != 0:
+			out.Quality[k] = defaultQuality[k]
 		default:
-			out.Quality[k] = 80
+			out.Quality[k] = 82
 		}
 	}
 
@@ -385,14 +400,55 @@ func mergeSettings(req models.JobConfig, instSettings models.InstanceSettings) m
 	}
 	allWidthKeys["default"] = true
 
+	// Better per-role max_width defaults
+	defaultMaxWidth := map[string]int{
+		"default":       1920,
+		"poster":        1000,
+		"season_poster": 1000,
+	}
+
 	for k := range allWidthKeys {
 		switch {
 		case req.MaxWidth != nil && req.MaxWidth[k] != 0:
 			out.MaxWidth[k] = req.MaxWidth[k]
 		case instSettings.MaxWidth != nil && instSettings.MaxWidth[k] != 0:
 			out.MaxWidth[k] = instSettings.MaxWidth[k]
+		case defaultMaxWidth[k] != 0:
+			out.MaxWidth[k] = defaultMaxWidth[k]
 		default:
 			out.MaxWidth[k] = 1920
+		}
+	}
+
+	// MinSizeKB: request > instance > default
+	allMinSizeKeys := make(map[string]bool)
+	for k := range req.MinSizeKB {
+		allMinSizeKeys[k] = true
+	}
+	for k := range instSettings.MinSizeKB {
+		allMinSizeKeys[k] = true
+	}
+	allMinSizeKeys["default"] = true
+
+	defaultMinSizeKB := map[string]int64{
+		"default":       30,
+		"poster":        50,
+		"fanart":        75,
+		"season_poster": 50,
+		"banner":        15,
+		"clearLogo":     10,
+	}
+
+	for k := range allMinSizeKeys {
+		switch {
+		case req.MinSizeKB != nil && req.MinSizeKB[k] != 0:
+			out.MinSizeKB[k] = req.MinSizeKB[k]
+		case instSettings.MinSizeKB != nil && instSettings.MinSizeKB[k] != 0:
+			out.MinSizeKB[k] = instSettings.MinSizeKB[k]
+		case defaultMinSizeKB[k] != 0:
+			out.MinSizeKB[k] = defaultMinSizeKB[k]
+		default:
+			out.MinSizeKB[k] = 30
 		}
 	}
 

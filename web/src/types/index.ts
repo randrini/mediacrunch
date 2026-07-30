@@ -12,8 +12,9 @@ export interface Instance {
 export interface InstanceSettings {
   quality?: Record<string, number>;     // role → JPEG quality (1-100)
   max_width?: Record<string, number>;   // role → max pixel width (100-8000)
-  backup?: boolean;                     // create .bak before overwriting
   min_saving_kb?: number;              // skip if savings < this (>= 0)
+  min_size_kb?: Record<string, number>; // role → minimum size threshold (KB)
+  backup?: boolean;                     // create .bak before overwriting
   lock_plex?: boolean;                 // auto-lock Plex metadata before compress
 }
 
@@ -63,8 +64,9 @@ export interface CompressionJob {
 export interface CompressConfig {
   quality: Record<string, number>;
   max_width: Record<string, number>;
-  backup: boolean;
   min_saving_kb: number;
+  min_size_kb: Record<string, number>;
+  backup: boolean;
   lock_plex: boolean;
 }
 

@@ -122,61 +122,134 @@
         <div class="relative card-glass w-full max-w-md mx-4 p-5">
           <h3 class="text-lg font-semibold text-slate-100 mb-4">Compress Settings</h3>
 
-          <div class="space-y-3">
-            <!-- Quality -->
+          <div class="space-y-5">
+            <!-- Section 1: Defaults -->
             <div>
-              <label class="block text-sm font-medium text-slate-300 mb-1">Quality (default)</label>
-              <input
-                v-model.number="compressConfig.quality_default"
-                type="number"
-                min="1"
-                max="100"
-                class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
-              />
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Defaults</h4>
+              <div class="space-y-3">
+                <!-- Quality -->
+                <div>
+                  <label class="block text-sm font-medium text-slate-300 mb-1">Quality</label>
+                  <input
+                    v-model.number="compressConfig.quality.default"
+                    type="number"
+                    min="1"
+                    max="100"
+                    class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
+                  />
+                </div>
+
+                <!-- Max Width -->
+                <div>
+                  <label class="block text-sm font-medium text-slate-300 mb-1">Max Width</label>
+                  <input
+                    v-model.number="compressConfig.max_width.default"
+                    type="number"
+                    min="100"
+                    step="100"
+                    class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
+                  />
+                </div>
+
+                <!-- Min Saving -->
+                <div>
+                  <label class="block text-sm font-medium text-slate-300 mb-1">Min Saving (KB)</label>
+                  <input
+                    v-model.number="compressConfig.min_saving_kb"
+                    type="number"
+                    min="0"
+                    class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
+                  />
+                </div>
+              </div>
             </div>
 
-            <!-- Max Width -->
+            <!-- Section 2: Role Overrides -->
             <div>
-              <label class="block text-sm font-medium text-slate-300 mb-1">Max Width (default)</label>
-              <input
-                v-model.number="compressConfig.max_width_default"
-                type="number"
-                min="100"
-                step="100"
-                class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
-              />
+              <button
+                type="button"
+                @click="showRoleOverrides = !showRoleOverrides"
+                class="group flex items-center text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-accent transition-base mb-3"
+              >
+                <svg
+                  class="w-3.5 h-3.5 mr-1.5 transition-transform duration-200"
+                  :class="{ 'rotate-90': showRoleOverrides }"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+                Role-specific settings
+              </button>
+
+              <div v-show="showRoleOverrides" class="space-y-3">
+                <div
+                  v-for="role in ROLE_ORDER"
+                  :key="role"
+                  class="bg-elevated/60 border border-white/[0.06] rounded-lg p-3"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-slate-200">{{ ROLE_LABELS[role] }}</span>
+                    <span class="inline-flex items-center text-[11px] font-medium text-slate-400 bg-base px-2 py-0.5 rounded">
+                      <svg class="w-3 h-3 mr-1 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                      </svg>
+                      Skip if < {{ MIN_SIZES[role] }} KB
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-xs text-slate-500 mb-1">Quality</label>
+                      <input
+                        v-model.number="compressConfig.quality[role]"
+                        type="number"
+                        min="1"
+                        max="100"
+                        class="w-full bg-base border border-white/[0.08] rounded-md px-2.5 py-1.5 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-xs text-slate-500 mb-1">Max Width</label>
+                      <input
+                        v-model.number="compressConfig.max_width[role]"
+                        type="number"
+                        min="100"
+                        step="100"
+                        class="w-full bg-base border border-white/[0.08] rounded-md px-2.5 py-1.5 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- Min Saving -->
+            <!-- Section 3: Options -->
             <div>
-              <label class="block text-sm font-medium text-slate-300 mb-1">Min Saving (KB)</label>
-              <input
-                v-model.number="compressConfig.min_saving_kb"
-                type="number"
-                min="0"
-                class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
-              />
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Options</h4>
+              <div class="space-y-3">
+                <!-- Backup toggle -->
+                <label class="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    v-model="compressConfig.backup"
+                    type="checkbox"
+                    class="rounded border-white/[0.08] bg-elevated text-accent focus:ring-accent/50"
+                  />
+                  <span class="text-sm text-slate-300">Create backup before compressing</span>
+                </label>
+
+                <!-- Lock Plex toggle -->
+                <label v-if="instance?.type === 'plex'" class="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    v-model="compressConfig.lock_plex"
+                    type="checkbox"
+                    class="rounded border-white/[0.08] bg-elevated text-accent focus:ring-accent/50"
+                  />
+                  <span class="text-sm text-slate-300">Lock Plex metadata fields</span>
+                </label>
+              </div>
             </div>
-
-            <!-- Backup toggle -->
-            <label class="flex items-center space-x-3">
-              <input
-                v-model="compressConfig.backup"
-                type="checkbox"
-                class="rounded border-white/[0.08] bg-elevated text-accent focus:ring-accent/50"
-              />
-              <span class="text-sm text-slate-300">Create backup before compressing</span>
-            </label>
-
-            <!-- Lock Plex toggle -->
-            <label v-if="instance?.type === 'plex'" class="flex items-center space-x-3">
-              <input
-                v-model="compressConfig.lock_plex"
-                type="checkbox"
-                class="rounded border-white/[0.08] bg-elevated text-accent focus:ring-accent/50"
-              />
-              <span class="text-sm text-slate-300">Lock Plex metadata fields</span>
-            </label>
           </div>
 
           <div class="flex justify-end space-x-3 mt-4">
@@ -224,13 +297,47 @@ const instanceId = computed(() => route.params.id as string)
 const instance = ref<Instance | null>(null)
 const stats = ref<Stats | null>(null)
 const showCompressModal = ref(false)
+const showRoleOverrides = ref(false)
 const compressTargetIds = ref<string[] | null>(null)
 const instanceSettings = ref<InstanceSettings | null>(null)
 
-const compressConfig = ref({
-  quality_default: 80,
-  max_width_default: 1920,
+const ROLE_DEFAULTS = {
+  quality: { default: 82, poster: 82, fanart: 82, season_poster: 82, banner: 85, clearLogo: 90 },
+  max_width: { default: 1920, poster: 1000, season_poster: 1000 },
+  min_size_kb: { default: 30, poster: 50, fanart: 75, season_poster: 50, banner: 15, clearLogo: 10 },
+}
+
+const MIN_SIZES: Record<string, number> = {
+  default: 30,
+  poster: 50,
+  fanart: 75,
+  season_poster: 50,
+  banner: 15,
+  clearLogo: 10,
+}
+
+const ROLE_LABELS: Record<string, string> = {
+  poster: 'Poster',
+  fanart: 'Fanart',
+  season_poster: 'Season Poster',
+  banner: 'Banner',
+  clearLogo: 'Clear Logo',
+}
+
+const ROLE_ORDER = ['poster', 'fanart', 'season_poster', 'banner', 'clearLogo']
+
+const compressConfig = ref<{
+  quality: Record<string, number>
+  max_width: Record<string, number>
+  min_saving_kb: number
+  min_size_kb: Record<string, number>
+  backup: boolean
+  lock_plex: boolean
+}>({
+  quality: { ...ROLE_DEFAULTS.quality },
+  max_width: { ...ROLE_DEFAULTS.max_width },
   min_saving_kb: 50,
+  min_size_kb: { ...ROLE_DEFAULTS.min_size_kb },
   backup: false,
   lock_plex: false,
 })
@@ -266,11 +373,11 @@ async function loadInstance() {
 async function loadSettings() {
   try {
     instanceSettings.value = await getInstanceSettings(instanceId.value)
-    // Pre-fill compress config from instance settings
+    // Pre-fill compress config from instance settings, deep-merging per-role maps
     const s = instanceSettings.value
     if (s) {
-      if (s.quality?.default !== undefined) compressConfig.value.quality_default = s.quality.default
-      if (s.max_width?.default !== undefined) compressConfig.value.max_width_default = s.max_width.default
+      if (s.quality) compressConfig.value.quality = { ...ROLE_DEFAULTS.quality, ...s.quality }
+      if (s.max_width) compressConfig.value.max_width = { ...ROLE_DEFAULTS.max_width, ...s.max_width }
       if (s.min_saving_kb !== undefined) compressConfig.value.min_saving_kb = s.min_saving_kb
       if (s.backup !== undefined) compressConfig.value.backup = s.backup
       if (s.lock_plex !== undefined) compressConfig.value.lock_plex = s.lock_plex
@@ -315,16 +422,11 @@ async function handleCompress(ids: string[]) {
 }
 
 async function startCompression() {
-  const config = {
-    quality: { default: compressConfig.value.quality_default },
-    max_width: { default: compressConfig.value.max_width_default },
-    min_saving_kb: compressConfig.value.min_saving_kb,
-    backup: compressConfig.value.backup,
-    lock_plex: compressConfig.value.lock_plex,
-  }
+  const config = { ...compressConfig.value }
   try {
     await compressState.startCompression(instanceId.value, compressTargetIds.value, config)
     showCompressModal.value = false
+    showRoleOverrides.value = false
   } catch {
     // error handled by composable
   }
