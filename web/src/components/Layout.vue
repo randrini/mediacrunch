@@ -77,7 +77,7 @@
     <footer class="border-t border-white/[0.06] py-2">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <p class="text-center text-[11px] text-slate-500 font-mono">
-          MediaCrunch v0.1.0 &mdash; Media image compression for Radarr, Sonarr &amp; Plex
+          MediaCrunch {{ version || '...' }} &mdash; Media image compression for Radarr, Sonarr &amp; Plex
         </p>
       </div>
     </footer>
@@ -89,6 +89,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useInstancesStore } from '../composables/useInstances'
+import axios from 'axios'
 
 const route = useRoute()
 const router = useRouter()
@@ -96,6 +97,7 @@ const store = useInstancesStore()
 
 const { instances } = storeToRefs(store)
 const selectedInstanceId = ref('')
+const version = ref('')
 
 function isActive(path: string): boolean {
   if (path === '/') return route.path === '/'
@@ -108,8 +110,14 @@ function onInstanceChange() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   store.fetchInstances()
+  try {
+    const res = await axios.get('/api/health')
+    version.value = res.data?.version || ''
+  } catch {
+    version.value = ''
+  }
 })
 
 watch(
