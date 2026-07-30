@@ -423,7 +423,7 @@ async function loadStats() {
 
 function onFilterChange(filters: any) {
   if (filters.search !== undefined) mediaStore.setFilter('search', filters.search)
-  if (filters.type !== undefined) mediaStore.setFilter('type', filters.type)
+  mediaStore.setFilter('type', filters.type)
   if (filters.compressed !== undefined) mediaStore.setFilter('compressed', filters.compressed)
   if (filters.locked !== undefined) mediaStore.setFilter('locked', filters.locked)
   mediaStore.fetchItems(instanceId.value)
