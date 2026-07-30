@@ -342,6 +342,32 @@ const compressConfig = ref<{
   lock_plex: false,
 })
 
+// Track previous default values so we can sync role overrides when defaults change
+const prevQualityDefault = ref(ROLE_DEFAULTS.quality.default)
+const prevMaxWidthDefault = ref(ROLE_DEFAULTS.max_width.default)
+
+// When the default quality changes, update any role override that matched the old default
+watch(() => compressConfig.value.quality.default, (newVal, oldVal) => {
+  if (oldVal === undefined) return
+  for (const role of ROLE_ORDER) {
+    if (compressConfig.value.quality[role] === oldVal) {
+      compressConfig.value.quality[role] = newVal
+    }
+  }
+  prevQualityDefault.value = newVal
+})
+
+// When the default max_width changes, update any role override that matched the old default
+watch(() => compressConfig.value.max_width.default, (newVal, oldVal) => {
+  if (oldVal === undefined) return
+  for (const role of ROLE_ORDER) {
+    if (compressConfig.value.max_width[role] === oldVal) {
+      compressConfig.value.max_width[role] = newVal
+    }
+  }
+  prevMaxWidthDefault.value = newVal
+})
+
 const progressPercent = computed(() => {
   const job = compressState.currentJob
   if (!job) return 0
