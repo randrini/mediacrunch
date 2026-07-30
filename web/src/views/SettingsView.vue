@@ -1,295 +1,261 @@
 <template>
   <div>
     <!-- Page Header -->
-    <div class="flex items-center justify-between mb-4">
-      <h1 class="text-lg font-bold text-slate-100 tracking-tight">Settings</h1>
-    </div>
-
-    <!-- Instance Selector (when no :id param) -->
-    <div v-if="!instanceId" class="mb-4">
-      <div v-if="instancesStore.loading" class="text-center py-12">
-        <svg class="animate-spin h-7 w-7 text-accent mx-auto" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-        </svg>
-        <p class="mt-2 text-slate-500 text-xs">Loading instances...</p>
-      </div>
-
-      <div v-else-if="instancesStore.instances.length === 0" class="text-center py-14">
-        <svg class="w-14 h-14 mx-auto text-slate-700 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-        <h2 class="text-base font-semibold text-slate-300 mb-1.5">No instances yet</h2>
-        <p class="text-slate-500 text-xs mb-4">Add an instance first to configure its settings.</p>
-        <router-link
-          to="/instances"
-          class="inline-flex items-center px-4 py-2 text-xs font-medium rounded bg-accent text-base hover:bg-accent-hover transition-base"
-        >
-          <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          Add Instance
-        </router-link>
-      </div>
-
-      <div v-else>
-        <label class="text-xs font-medium text-slate-400 block mb-1.5">Select Instance</label>
-        <select
-          v-model="selectedInstanceId"
-          @change="onInstanceSelected"
-          class="bg-elevated text-slate-100 border border-white/[0.06] rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent w-full max-w-md font-mono"
-        >
-          <option value="" disabled>Choose an instance...</option>
-          <option
-            v-for="inst in instancesStore.instances"
-            :key="inst.id"
-            :value="inst.id"
-          >
-            {{ inst.name }} ({{ inst.type }})
-          </option>
-        </select>
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <h1 class="text-xl font-bold text-slate-100 tracking-tight">Settings</h1>
+        <p class="text-xs text-slate-500 mt-1">
+          {{ instancesStore.instances.length }} instance{{ instancesStore.instances.length === 1 ? '' : 's' }} configured
+        </p>
       </div>
     </div>
 
-    <!-- Settings Content -->
-    <div v-if="instanceId && currentInstance">
-      <!-- Loading -->
-      <div v-if="store.loading && !store.settings[instanceId]" class="text-center py-12">
-        <svg class="animate-spin h-7 w-7 text-accent mx-auto" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-        </svg>
-        <p class="mt-2 text-slate-500 text-xs">Loading settings...</p>
-      </div>
+    <!-- Loading -->
+    <div v-if="loading" class="text-center py-16">
+      <svg class="animate-spin h-8 w-8 text-accent mx-auto" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+      </svg>
+      <p class="mt-3 text-slate-500 text-xs">Loading instance settings...</p>
+    </div>
 
-      <div v-else @input="formDirty = true">
-        <!-- Instance Info -->
-        <div class="card-glass p-3 mb-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-sm font-semibold text-slate-100">{{ currentInstance.name }}</h2>
-              <p class="text-xs text-slate-500 font-mono capitalize">{{ currentInstance.type }} &middot; {{ currentInstance.host }}</p>
-            </div>
-            <span
-              class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium capitalize"
-              :class="instanceTypeBadge"
+    <!-- Empty State -->
+    <div v-else-if="instancesStore.instances.length === 0" class="text-center py-16">
+      <svg class="w-16 h-16 mx-auto text-slate-700 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <h2 class="text-base font-semibold text-slate-300 mb-1.5">No instances yet</h2>
+      <p class="text-slate-500 text-xs mb-5">Add an instance first to configure its compression settings.</p>
+      <router-link
+        to="/instances"
+        class="inline-flex items-center px-4 py-2 text-xs font-medium rounded bg-accent text-base hover:bg-accent-hover transition-base"
+      >
+        <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        Add Instance
+      </router-link>
+    </div>
+
+    <!-- Instance Cards Grid -->
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div
+        v-for="inst in instancesStore.instances"
+        :key="inst.id"
+        :ref="(el) => { if (el) cardRefs[inst.id] = el as HTMLElement }"
+        class="card-glass flex flex-col"
+        :class="{ 'ring-1 ring-accent/40': inst.id === instanceIdFromRoute }"
+      >
+        <!-- Card Header -->
+        <div class="flex items-start justify-between gap-3 p-4 border-b border-white/[0.06]">
+          <div class="flex items-start gap-3 min-w-0">
+            <div
+              class="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold font-mono shrink-0 border"
+              :class="typeIconClass(inst.type)"
             >
-              {{ currentInstance.type }}
-            </span>
+              {{ typeIconText(inst.type) }}
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-sm font-semibold text-slate-100 truncate">{{ inst.name }}</h3>
+              <p class="text-xs text-slate-500 font-mono truncate">{{ inst.host }}</p>
+            </div>
           </div>
+          <span
+            class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium capitalize shrink-0 border"
+            :class="typeBadgeClass(inst.type)"
+          >
+            {{ inst.type }}
+          </span>
         </div>
 
-        <!-- Toast Notifications -->
-        <div v-if="toast" class="mb-4" :class="toast.type === 'success' ? 'bg-accent/10 border border-accent/20 text-accent rounded p-3' : 'bg-danger/10 border border-danger/20 text-danger rounded p-3'">
-          <div class="flex items-center justify-between">
-            <p class="text-xs">{{ toast.message }}</p>
-            <button @click="toast = null" class="text-xs opacity-70 hover:opacity-100">&times;</button>
-          </div>
-        </div>
-
-        <!-- Quality Settings -->
-        <div class="card-glass p-4 mb-3">
-          <h3 class="text-sm font-semibold text-slate-100 mb-3">Quality Settings</h3>
-          <p class="text-xs text-slate-500 mb-3">JPEG quality for image roles (1-100). Higher values = better quality, larger files.</p>
-
-          <!-- Default Quality -->
-          <div class="mb-3">
-            <label class="text-xs font-medium text-slate-400 block mb-1">Default Quality</label>
-            <input
-              type="number"
-              min="1"
-              max="100"
-              v-model.number="form.quality.default"
-              class="bg-elevated border border-white/[0.06] rounded px-3 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full max-w-xs font-mono text-sm"
-            />
-          </div>
-
-          <!-- Role Overrides -->
-          <div v-if="form.quality.overrides.length > 0">
-            <label class="text-xs font-medium text-slate-400 block mb-1.5">Role Overrides</label>
-            <div class="space-y-1.5">
-              <div
-                v-for="(override, index) in form.quality.overrides"
-                :key="index"
-                class="flex items-center space-x-2"
-              >
-                <select
-                  v-model="override.role"
-                  class="bg-elevated text-slate-100 border border-white/[0.06] rounded px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent flex-1 max-w-[200px]"
-                >
-                  <option v-for="role in availableRoles" :key="role" :value="role">{{ role }}</option>
-                </select>
+        <!-- Card Body -->
+        <div v-if="forms[inst.id]" class="p-4 space-y-5 flex-1" @input="dirty[inst.id] = true">
+          <!-- Defaults -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Defaults</h4>
+            <div class="grid grid-cols-3 gap-3">
+              <label class="block">
+                <span class="text-[10px] text-slate-500 block mb-1">Quality</span>
                 <input
                   type="number"
                   min="1"
                   max="100"
-                  v-model.number="override.value"
-                  class="bg-elevated border border-white/[0.06] rounded px-2.5 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-20 font-mono text-sm"
+                  v-model.number="forms[inst.id].quality_default"
+                  class="bg-elevated border border-white/[0.06] rounded px-2 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
                 />
-                <button
-                  @click="removeQualityOverride(index)"
-                  class="text-danger hover:text-red-400 transition-base p-1"
-                  title="Remove override"
-                >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <button
-            @click="addQualityOverride"
-            class="mt-2 inline-flex items-center text-xs text-accent hover:text-accent-hover transition-base"
-          >
-            <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            Add role override
-          </button>
-        </div>
-
-        <!-- Max Width Settings -->
-        <div class="card-glass p-4 mb-3">
-          <h3 class="text-sm font-semibold text-slate-100 mb-3">Max Width Settings</h3>
-          <p class="text-xs text-slate-500 mb-3">Maximum pixel width for image roles (100-8000). Images wider than this will be resized.</p>
-
-          <!-- Default Max Width -->
-          <div class="mb-3">
-            <label class="text-xs font-medium text-slate-400 block mb-1">Default Max Width</label>
-            <input
-              type="number"
-              min="100"
-              max="8000"
-              v-model.number="form.max_width.default"
-              class="bg-elevated border border-white/[0.06] rounded px-3 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full max-w-xs font-mono text-sm"
-            />
-          </div>
-
-          <!-- Role Overrides -->
-          <div v-if="form.max_width.overrides.length > 0">
-            <label class="text-xs font-medium text-slate-400 block mb-1.5">Role Overrides</label>
-            <div class="space-y-1.5">
-              <div
-                v-for="(override, index) in form.max_width.overrides"
-                :key="index"
-                class="flex items-center space-x-2"
-              >
-                <select
-                  v-model="override.role"
-                  class="bg-elevated text-slate-100 border border-white/[0.06] rounded px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent flex-1 max-w-[200px]"
-                >
-                  <option v-for="role in availableRoles" :key="role" :value="role">{{ role }}</option>
-                </select>
+              </label>
+              <label class="block">
+                <span class="text-[10px] text-slate-500 block mb-1">Max Width</span>
                 <input
                   type="number"
                   min="100"
                   max="8000"
-                  v-model.number="override.value"
-                  class="bg-elevated border border-white/[0.06] rounded px-2.5 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-20 font-mono text-sm"
+                  v-model.number="forms[inst.id].max_width_default"
+                  class="bg-elevated border border-white/[0.06] rounded px-2 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
                 />
-                <button
-                  @click="removeMaxWidthOverride(index)"
-                  class="text-danger hover:text-red-400 transition-base p-1"
-                  title="Remove override"
-                >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
+              </label>
+              <label class="block">
+                <span class="text-[10px] text-slate-500 block mb-1">Min Saving (KB)</span>
+                <input
+                  type="number"
+                  min="0"
+                  v-model.number="forms[inst.id].min_saving_kb"
+                  class="bg-elevated border border-white/[0.06] rounded px-2 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
+                />
+              </label>
+            </div>
+          </div>
+
+          <!-- Role Overrides -->
+          <div>
+            <button
+              type="button"
+              @click="expandedRoles[inst.id] = !expandedRoles[inst.id]"
+              class="w-full flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider hover:text-slate-300 transition-base py-1"
+            >
+              <span>Role Overrides</span>
+              <svg
+                class="w-4 h-4 text-slate-500 transition-transform duration-200"
+                :class="{ 'rotate-90': expandedRoles[inst.id] }"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <div v-show="expandedRoles[inst.id]" class="mt-3 space-y-2">
+              <div
+                v-for="role in rolesForType(inst.type)"
+                :key="role"
+                class="bg-white/[0.02] border border-white/[0.06] rounded-lg p-3"
+              >
+                <div class="flex items-center justify-between mb-2.5">
+                  <span class="text-xs font-medium text-slate-300">{{ ROLE_LABELS[role] || role }}</span>
+                  <span class="inline-flex items-center text-[10px] text-slate-500 font-mono">
+                    <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                    Skip if &lt; {{ forms[inst.id].roles[role].min_size_kb }} KB
+                  </span>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                  <label class="block">
+                    <span class="text-[10px] text-slate-500 block mb-1">Quality</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="100"
+                      v-model.number="forms[inst.id].roles[role].quality"
+                      class="bg-elevated border border-white/[0.06] rounded px-2 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
+                    />
+                  </label>
+                  <label class="block">
+                    <span class="text-[10px] text-slate-500 block mb-1">Max Width</span>
+                    <input
+                      type="number"
+                      min="100"
+                      max="8000"
+                      v-model.number="forms[inst.id].roles[role].max_width"
+                      class="bg-elevated border border-white/[0.06] rounded px-2 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
+                    />
+                  </label>
+                  <label class="block">
+                    <span class="text-[10px] text-slate-500 block mb-1">Min Size (KB)</span>
+                    <input
+                      type="number"
+                      min="0"
+                      v-model.number="forms[inst.id].roles[role].min_size_kb"
+                      class="bg-elevated border border-white/[0.06] rounded px-2 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
+                    />
+                  </label>
+                </div>
               </div>
             </div>
           </div>
 
-          <button
-            @click="addMaxWidthOverride"
-            class="mt-2 inline-flex items-center text-xs text-accent hover:text-accent-hover transition-base"
+          <!-- Options -->
+          <div class="space-y-2">
+            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Options</h4>
+
+            <!-- Backup Toggle -->
+            <div class="flex items-center justify-between py-2">
+              <div class="pr-4">
+                <label class="text-xs font-medium text-slate-300">Create backup</label>
+                <p class="text-[10px] text-slate-500 mt-0.5">Create a .bak copy before overwriting images</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="forms[inst.id].backup"
+                @click="forms[inst.id].backup = !forms[inst.id].backup; dirty[inst.id] = true"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-1 focus:ring-accent focus:ring-offset-1 focus:ring-offset-base"
+                :class="forms[inst.id].backup ? 'bg-accent' : 'bg-slate-600'"
+              >
+                <span
+                  class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform"
+                  :class="forms[inst.id].backup ? 'translate-x-[18px]' : 'translate-x-[3px]'"
+                />
+              </button>
+            </div>
+
+            <!-- Lock Plex Toggle (Plex only) -->
+            <div v-if="inst.type === 'plex'" class="flex items-center justify-between py-2">
+              <div class="pr-4">
+                <label class="text-xs font-medium text-slate-300">Lock Plex metadata</label>
+                <p class="text-[10px] text-slate-500 mt-0.5">Auto-lock Plex metadata before compression</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="forms[inst.id].lock_plex"
+                @click="forms[inst.id].lock_plex = !forms[inst.id].lock_plex; dirty[inst.id] = true"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-1 focus:ring-accent focus:ring-offset-1 focus:ring-offset-base"
+                :class="forms[inst.id].lock_plex ? 'bg-accent' : 'bg-slate-600'"
+              >
+                <span
+                  class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform"
+                  :class="forms[inst.id].lock_plex ? 'translate-x-[18px]' : 'translate-x-[3px]'"
+                />
+              </button>
+            </div>
+          </div>
+
+          <!-- Inline Toast -->
+          <div
+            v-if="toasts[inst.id]"
+            class="rounded p-2.5 text-xs"
+            :class="toasts[inst.id]!.type === 'success' ? 'bg-accent/10 border border-accent/20 text-accent' : 'bg-danger/10 border border-danger/20 text-danger'"
           >
-            <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            Add role override
-          </button>
-        </div>
-
-        <!-- General Settings -->
-        <div class="card-glass p-4 mb-3">
-          <h3 class="text-sm font-semibold text-slate-100 mb-3">General Settings</h3>
-
-          <!-- Backup Toggle -->
-          <div class="flex items-center justify-between py-2.5 border-b border-white/[0.04]">
-            <div>
-              <label class="text-xs font-medium text-slate-300">Backup original files</label>
-              <p class="text-[11px] text-slate-500 mt-0.5">Create a .bak copy before overwriting images</p>
+            <div class="flex items-center justify-between">
+              <p>{{ toasts[inst.id]!.message }}</p>
+              <button @click="toasts[inst.id] = null" class="opacity-70 hover:opacity-100 ml-2">&times;</button>
             </div>
-            <button
-              type="button"
-              role="switch"
-              :aria-checked="form.backup"
-              @click="form.backup = !form.backup; formDirty = true"
-              class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-1 focus:ring-accent focus:ring-offset-1 focus:ring-offset-base"
-              :class="form.backup ? 'bg-accent' : 'bg-slate-600'"
-            >
-              <span
-                class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform"
-                :class="form.backup ? 'translate-x-[18px]' : 'translate-x-[3px]'"
-              />
-            </button>
-          </div>
-
-          <!-- Min Saving Threshold -->
-          <div class="py-2.5 border-b border-white/[0.04]">
-            <label class="text-xs font-medium text-slate-300 block mb-1">Minimum saving threshold (KB)</label>
-            <p class="text-[11px] text-slate-500 mb-1.5">Skip compression if estimated savings are below this amount</p>
-            <input
-              type="number"
-              min="0"
-              v-model.number="form.min_saving_kb"
-              class="bg-elevated border border-white/[0.06] rounded px-3 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full max-w-xs font-mono text-sm"
-            />
-          </div>
-
-          <!-- Auto-lock Plex Metadata (Plex only) -->
-          <div v-if="currentInstance.type === 'plex'" class="flex items-center justify-between py-2.5">
-            <div>
-              <label class="text-xs font-medium text-slate-300">Auto-lock Plex metadata</label>
-              <p class="text-[11px] text-slate-500 mt-0.5">Automatically lock Plex metadata before compression to prevent Plex from overwriting compressed images</p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              :aria-checked="form.lock_plex"
-              @click="form.lock_plex = !form.lock_plex; formDirty = true"
-              class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-1 focus:ring-accent focus:ring-offset-1 focus:ring-offset-base"
-              :class="form.lock_plex ? 'bg-accent' : 'bg-slate-600'"
-            >
-              <span
-                class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform"
-                :class="form.lock_plex ? 'translate-x-[18px]' : 'translate-x-[3px]'"
-              />
-            </button>
           </div>
         </div>
 
-        <!-- Footer Actions -->
-        <div class="flex items-center justify-between pt-1 pb-6">
+        <!-- Card Footer -->
+        <div class="flex items-center justify-between p-4 border-t border-white/[0.06] mt-auto">
           <button
-            @click="resetToDefaults"
+            type="button"
+            @click="resetInstance(inst.id)"
             class="bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 font-medium px-3 py-1.5 rounded transition-base text-xs"
           >
             Reset to Defaults
           </button>
           <button
-            @click="saveSettings"
-            :disabled="store.loading"
+            type="button"
+            @click="saveInstance(inst.id)"
+            :disabled="saving[inst.id]"
             class="bg-accent hover:bg-accent-hover disabled:bg-accent/50 disabled:cursor-not-allowed text-base font-medium px-3 py-1.5 rounded transition-base text-xs inline-flex items-center"
           >
-            <svg v-if="store.loading" class="animate-spin h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24">
+            <svg v-if="saving[inst.id]" class="animate-spin h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
-            Save Settings
+            Save
           </button>
         </div>
       </div>
@@ -298,214 +264,229 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { useInstancesStore } from '../composables/useInstances'
 import { useSettingsStore } from '../composables/useSettings'
-import type { InstanceSettings } from '../types'
+import type { Instance, InstanceSettings } from '../types'
 
 const route = useRoute()
 const instancesStore = useInstancesStore()
-const store = useSettingsStore()
+const settingsStore = useSettingsStore()
 
-const selectedInstanceId = ref('')
-const toast = ref<{ type: 'success' | 'error'; message: string } | null>(null)
-const formDirty = ref(false)
-
-interface OverrideEntry {
-  role: string
-  value: number
+interface RoleForm {
+  quality: number
+  max_width: number
+  min_size_kb: number
 }
 
 interface SettingsForm {
-  quality: { default: number; overrides: OverrideEntry[] }
-  max_width: { default: number; overrides: OverrideEntry[] }
-  backup: boolean
+  quality_default: number
+  max_width_default: number
   min_saving_kb: number
+  backup: boolean
   lock_plex: boolean
+  roles: Record<string, RoleForm>
 }
 
-const form = ref<SettingsForm>({
-  quality: { default: 80, overrides: [] },
-  max_width: { default: 1920, overrides: [] },
-  backup: false,
-  min_saving_kb: 50,
-  lock_plex: false,
-})
+interface Toast {
+  type: 'success' | 'error'
+  message: string
+}
 
-// All possible roles
-const allRoles = [
-  'poster',
-  'art',
-  'clearLogo',
-  'banner',
-  'squareArt',
-  'season_poster',
-  'episode_thumb',
-  'fanart',
-] as const
+const ROLE_DEFAULTS: {
+  quality: Record<string, number>
+  max_width: Record<string, number>
+  min_size_kb: Record<string, number>
+} = {
+  quality: { default: 82, poster: 82, fanart: 82, season_poster: 82, banner: 85, clearLogo: 90 },
+  max_width: { default: 1920, poster: 1000, season_poster: 1000 },
+  min_size_kb: { default: 30, poster: 50, fanart: 75, season_poster: 50, banner: 15, clearLogo: 10 },
+}
 
-// Roles relevant per instance type
-const plexRoles = ['poster', 'art', 'clearLogo', 'banner', 'squareArt', 'season_poster', 'episode_thumb', 'fanart']
-const radarrRoles = ['poster', 'fanart']
-const sonarrRoles = ['poster', 'fanart', 'banner', 'clearLogo']
+const ROLE_LABELS: Record<string, string> = {
+  poster: 'Poster',
+  fanart: 'Fanart',
+  season_poster: 'Season Poster',
+  banner: 'Banner',
+  clearLogo: 'Clear Logo',
+  episode_thumb: 'Episode Thumb',
+  art: 'Art',
+  squareArt: 'Square Art',
+}
 
-const availableRoles = computed(() => {
-  if (!currentInstance.value) return allRoles as unknown as string[]
-  switch (currentInstance.value.type) {
-    case 'plex': return plexRoles
-    case 'radarr': return radarrRoles
-    case 'sonarr': return sonarrRoles
-    default: return allRoles as unknown as string[]
-  }
-})
+const PLEX_ROLES = ['poster', 'fanart', 'banner', 'clearLogo', 'season_poster', 'episode_thumb', 'art', 'squareArt']
+const RADARR_ROLES = ['poster', 'fanart']
+const SONARR_ROLES = ['poster', 'fanart', 'banner', 'clearLogo']
 
-// Resolve instance ID from route param or selection
-const instanceId = computed(() => {
-  return (route.params.id as string) || selectedInstanceId.value || null
-})
+const loading = ref(false)
+const forms = reactive<Record<string, SettingsForm>>({})
+const dirty = reactive<Record<string, boolean>>({})
+const toasts = reactive<Record<string, Toast | null>>({})
+const saving = reactive<Record<string, boolean>>({})
+const expandedRoles = reactive<Record<string, boolean>>({})
+const cardRefs = reactive<Record<string, HTMLElement | null>>({})
 
-const currentInstance = computed(() => {
-  if (!instanceId.value) return null
-  return instancesStore.instances.find(i => i.id === instanceId.value) || null
-})
+const instanceIdFromRoute = computed(() => route.params.id as string | undefined)
 
-const instanceTypeBadge = computed(() => {
-  if (!currentInstance.value) return ''
-  switch (currentInstance.value.type) {
-    case 'plex': return 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
-    case 'radarr': return 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-    case 'sonarr': return 'bg-accent/10 text-accent border border-accent/20'
-    default: return 'bg-white/[0.04] text-slate-400 border border-white/[0.06]'
-  }
-})
-
-function settingsToForm(s: InstanceSettings | undefined) {
-  const qualityOverrides: OverrideEntry[] = []
-  const maxWidthOverrides: OverrideEntry[] = []
-
-  if (s?.quality) {
-    for (const [role, value] of Object.entries(s.quality)) {
-      if (role === 'default') continue
-      qualityOverrides.push({ role, value })
-    }
-  }
-  if (s?.max_width) {
-    for (const [role, value] of Object.entries(s.max_width)) {
-      if (role === 'default') continue
-      maxWidthOverrides.push({ role, value })
-    }
-  }
-
-  form.value = {
-    quality: {
-      default: s?.quality?.default ?? 80,
-      overrides: qualityOverrides,
-    },
-    max_width: {
-      default: s?.max_width?.default ?? 1920,
-      overrides: maxWidthOverrides,
-    },
-    backup: s?.backup ?? false,
-    min_saving_kb: s?.min_saving_kb ?? 50,
-    lock_plex: s?.lock_plex ?? false,
+function rolesForType(type: string): string[] {
+  switch (type) {
+    case 'radarr': return RADARR_ROLES
+    case 'sonarr': return SONARR_ROLES
+    case 'plex': return PLEX_ROLES
+    default: return []
   }
 }
 
-function formToSettings(): Partial<InstanceSettings> {
-  const quality: Record<string, number> = { default: form.value.quality.default }
-  for (const o of form.value.quality.overrides) {
-    if (o.role) quality[o.role] = o.value
+function typeIconText(type: string): string {
+  switch (type) {
+    case 'radarr': return 'R'
+    case 'sonarr': return 'S'
+    case 'plex': return 'P'
+    default: return type.charAt(0).toUpperCase()
+  }
+}
+
+function typeIconClass(type: string): string {
+  switch (type) {
+    case 'radarr': return 'bg-blue-500/15 text-blue-400 border-blue-500/25'
+    case 'sonarr': return 'bg-purple-500/15 text-purple-400 border-purple-500/25'
+    case 'plex': return 'bg-orange-500/15 text-orange-400 border-orange-500/25'
+    default: return 'bg-white/[0.04] text-slate-400 border-white/[0.06]'
+  }
+}
+
+function typeBadgeClass(type: string): string {
+  switch (type) {
+    case 'radarr': return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+    case 'sonarr': return 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+    case 'plex': return 'bg-orange-500/10 text-orange-400 border-orange-500/20'
+    default: return 'bg-white/[0.04] text-slate-400 border-white/[0.06]'
+  }
+}
+
+function getDefaultQuality(role: string): number {
+  return ROLE_DEFAULTS.quality[role] ?? ROLE_DEFAULTS.quality.default
+}
+
+function getDefaultMaxWidth(role: string): number {
+  return ROLE_DEFAULTS.max_width[role] ?? ROLE_DEFAULTS.max_width.default
+}
+
+function getDefaultMinSize(role: string): number {
+  return ROLE_DEFAULTS.min_size_kb[role] ?? ROLE_DEFAULTS.min_size_kb.default
+}
+
+function mergeWithDefaults(settings: InstanceSettings | undefined, type: string): SettingsForm {
+  const roles: Record<string, RoleForm> = {}
+  const rolesList = rolesForType(type)
+
+  for (const role of rolesList) {
+    roles[role] = {
+      quality: settings?.quality?.[role] ?? getDefaultQuality(role),
+      max_width: settings?.max_width?.[role] ?? getDefaultMaxWidth(role),
+      min_size_kb: settings?.min_size_kb?.[role] ?? getDefaultMinSize(role),
+    }
   }
 
-  const max_width: Record<string, number> = { default: form.value.max_width.default }
-  for (const o of form.value.max_width.overrides) {
-    if (o.role) max_width[o.role] = o.value
+  return {
+    quality_default: settings?.quality?.default ?? ROLE_DEFAULTS.quality.default,
+    max_width_default: settings?.max_width?.default ?? ROLE_DEFAULTS.max_width.default,
+    min_saving_kb: settings?.min_saving_kb ?? 50,
+    backup: settings?.backup ?? false,
+    lock_plex: settings?.lock_plex ?? false,
+    roles,
+  }
+}
+
+function formToSettings(form: SettingsForm): Partial<InstanceSettings> {
+  const quality: Record<string, number> = { default: form.quality_default }
+  const max_width: Record<string, number> = { default: form.max_width_default }
+  const min_size_kb: Record<string, number> = { default: ROLE_DEFAULTS.min_size_kb.default }
+
+  for (const [role, values] of Object.entries(form.roles)) {
+    quality[role] = values.quality
+    max_width[role] = values.max_width
+    min_size_kb[role] = values.min_size_kb
   }
 
   return {
     quality,
     max_width,
-    backup: form.value.backup,
-    min_saving_kb: form.value.min_saving_kb,
-    lock_plex: form.value.lock_plex,
+    min_size_kb,
+    min_saving_kb: form.min_saving_kb,
+    backup: form.backup,
+    lock_plex: form.lock_plex,
   }
 }
 
-function addQualityOverride() {
-  const usedRoles = form.value.quality.overrides.map(o => o.role)
-  const available = availableRoles.value.filter(r => !usedRoles.includes(r))
-  if (available.length === 0) return
-  form.value.quality.overrides.push({ role: available[0], value: form.value.quality.default })
+function populateForm(instance: Instance) {
+  const settings = settingsStore.settings[instance.id]
+  forms[instance.id] = mergeWithDefaults(settings, instance.type)
 }
 
-function removeQualityOverride(index: number) {
-  form.value.quality.overrides.splice(index, 1)
+async function loadAllSettings() {
+  await Promise.all(
+    instancesStore.instances.map(async (inst) => {
+      try {
+        await settingsStore.fetchSettings(inst.id)
+      } catch {
+        toasts[inst.id] = { type: 'error', message: 'Failed to load settings.' }
+      } finally {
+        populateForm(inst)
+      }
+    })
+  )
 }
 
-function addMaxWidthOverride() {
-  const usedRoles = form.value.max_width.overrides.map(o => o.role)
-  const available = availableRoles.value.filter(r => !usedRoles.includes(r))
-  if (available.length === 0) return
-  form.value.max_width.overrides.push({ role: available[0], value: form.value.max_width.default })
-}
+async function saveInstance(id: string) {
+  saving[id] = true
+  toasts[id] = null
 
-function removeMaxWidthOverride(index: number) {
-  form.value.max_width.overrides.splice(index, 1)
-}
-
-function resetToDefaults() {
-  form.value = {
-    quality: { default: 80, overrides: [] },
-    max_width: { default: 1920, overrides: [] },
-    backup: false,
-    min_saving_kb: 50,
-    lock_plex: false,
-  }
-  toast.value = { type: 'success', message: 'Form reset to defaults (not yet saved).' }
-}
-
-async function saveSettings() {
-  if (!instanceId.value) return
   try {
-    await store.saveSettings(instanceId.value, formToSettings())
-    formDirty.value = false
-    toast.value = { type: 'success', message: 'Settings saved successfully.' }
-  } catch {
-    toast.value = { type: 'error', message: store.error || 'Failed to save settings.' }
+    const form = forms[id]
+    if (!form) return
+
+    await settingsStore.saveSettings(id, formToSettings(form))
+    dirty[id] = false
+    populateForm({ ...instancesStore.instances.find(i => i.id === id)!, settings: settingsStore.settings[id] })
+    toasts[id] = { type: 'success', message: 'Settings saved successfully.' }
+  } catch (e: any) {
+    const message = e?.response?.data?.error || e?.message || settingsStore.error || 'Failed to save settings.'
+    toasts[id] = { type: 'error', message }
+  } finally {
+    saving[id] = false
   }
 }
 
-function onInstanceSelected() {
-  if (selectedInstanceId.value) {
-    // Settings will be loaded by the watcher on instanceId
-  }
+function resetInstance(id: string) {
+  const inst = instancesStore.instances.find(i => i.id === id)
+  if (!inst) return
+  forms[id] = mergeWithDefaults(undefined, inst.type)
+  dirty[id] = true
+  toasts[id] = { type: 'success', message: 'Reset to defaults (not yet saved).' }
 }
 
-// Load settings when instance ID changes
-watch(instanceId, (newId) => {
-  if (newId) {
-    formDirty.value = false
-    if (store.settings[newId]) {
-      settingsToForm(store.settings[newId])
+// Update forms if settings are fetched/refreshed externally, but only for cards that haven't been edited
+watch(() => settingsStore.settings, (newSettings) => {
+  for (const [id, settings] of Object.entries(newSettings)) {
+    if (dirty[id]) continue
+    const inst = instancesStore.instances.find(i => i.id === id)
+    if (inst) {
+      forms[id] = mergeWithDefaults(settings, inst.type)
     }
-    store.fetchSettings(newId)
-  }
-})
-
-// Update form when settings are fetched
-watch(() => store.settings, (newSettings) => {
-  if (instanceId.value && newSettings[instanceId.value] && !formDirty.value) {
-    settingsToForm(newSettings[instanceId.value])
   }
 }, { deep: true })
 
 onMounted(async () => {
+  loading.value = true
   await instancesStore.fetchInstances()
+  await loadAllSettings()
+  loading.value = false
 
-  // If route has :id param, auto-select
-  if (route.params.id) {
-    selectedInstanceId.value = route.params.id as string
+  if (instanceIdFromRoute.value && cardRefs[instanceIdFromRoute.value]) {
+    await nextTick()
+    cardRefs[instanceIdFromRoute.value]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 })
 </script>

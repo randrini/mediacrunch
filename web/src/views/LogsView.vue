@@ -196,7 +196,8 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { getLogs, clearLogs } from '../api'
 import { useInstancesStore } from '../composables/useInstances'
-import type { LogEntry, LogQueryParams } from '../api'
+import type { LogEntry } from '../types'
+import type { LogQueryParams } from '../api'
 
 const logs = ref<LogEntry[]>([])
 const total = ref(0)

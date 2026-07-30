@@ -388,6 +388,9 @@ func (h *InstanceHandler) GetSettings(c *gin.Context) {
 	if inst.Settings.MaxWidth == nil {
 		inst.Settings.MaxWidth = map[string]int{}
 	}
+	if inst.Settings.MinSizeKB == nil {
+		inst.Settings.MinSizeKB = map[string]int64{}
+	}
 
 	c.JSON(http.StatusOK, inst.Settings)
 }
@@ -429,6 +432,14 @@ func (h *InstanceHandler) UpdateSettings(c *gin.Context) {
 		}
 	}
 
+	// Validate min_size_kb values
+	for role, ms := range input.MinSizeKB {
+		if ms < 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("min_size_kb for %q must be >= 0", role)})
+			return
+		}
+	}
+
 	// Validate min_saving_kb
 	if input.MinSavingKB != nil && *input.MinSavingKB < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "min_saving_kb must be >= 0"})
@@ -462,6 +473,9 @@ func (h *InstanceHandler) UpdateSettings(c *gin.Context) {
 	}
 	if input.MaxWidth == nil {
 		input.MaxWidth = map[string]int{}
+	}
+	if input.MinSizeKB == nil {
+		input.MinSizeKB = map[string]int64{}
 	}
 
 	c.JSON(http.StatusOK, input)
