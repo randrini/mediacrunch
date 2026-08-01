@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="main-content">
     <!-- Instance Header -->
     <div v-if="instance" class="mb-4">
       <div class="flex items-center justify-between">
@@ -117,6 +117,10 @@
       <div
         v-if="showCompressModal"
         class="fixed inset-0 z-50 flex items-center justify-center"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Compression settings"
+        @keydown="handleModalKeydown"
       >
         <div class="absolute inset-0 bg-base/80 backdrop-blur-md" @click="showCompressModal = false" />
         <div class="relative card-glass w-full max-w-md mx-4 p-5">
@@ -274,13 +278,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useInstancesStore } from '../composables/useInstances'
 import { useMediaStore } from '../composables/useMedia'
 import { useCompressStore } from '../composables/useCompress'
 import { getInstance, getInstanceStats, getInstanceSettings } from '../api'
 import type { Instance, Stats, InstanceSettings } from '../types'
+import { ROLE_DEFAULTS, MIN_SIZES, ROLE_LABELS, ROLE_ORDER } from '../constants/defaults'
 import MediaTable from '../components/MediaTable.vue'
 import SearchFilter from '../components/SearchFilter.vue'
 import StatsBar from '../components/StatsBar.vue'
@@ -301,31 +306,6 @@ const showRoleOverrides = ref(false)
 const compressTargetIds = ref<string[] | null>(null)
 const instanceSettings = ref<InstanceSettings | null>(null)
 
-const ROLE_DEFAULTS = {
-  quality: { default: 82, poster: 82, fanart: 82, season_poster: 82, banner: 85, clearLogo: 90 },
-  max_width: { default: 1920, poster: 1000, season_poster: 1000 },
-  min_size_kb: { default: 30, poster: 50, fanart: 75, season_poster: 50, banner: 15, clearLogo: 10 },
-}
-
-const MIN_SIZES: Record<string, number> = {
-  default: 30,
-  poster: 50,
-  fanart: 75,
-  season_poster: 50,
-  banner: 15,
-  clearLogo: 10,
-}
-
-const ROLE_LABELS: Record<string, string> = {
-  poster: 'Poster',
-  fanart: 'Fanart',
-  season_poster: 'Season Poster',
-  banner: 'Banner',
-  clearLogo: 'Clear Logo',
-}
-
-const ROLE_ORDER = ['poster', 'fanart', 'season_poster', 'banner', 'clearLogo']
-
 const compressConfig = ref<{
   quality: Record<string, number>
   max_width: Record<string, number>
@@ -345,9 +325,11 @@ const compressConfig = ref<{
 // Track previous default values so we can sync role overrides when defaults change
 const prevQualityDefault = ref(ROLE_DEFAULTS.quality.default)
 const prevMaxWidthDefault = ref(ROLE_DEFAULTS.max_width.default)
+const settingsLoaded = ref(false)
 
 // When the default quality changes, update any role override that matched the old default
 watch(() => compressConfig.value.quality.default, (newVal, oldVal) => {
+  if (!settingsLoaded.value) return
   if (oldVal === undefined) return
   for (const role of ROLE_ORDER) {
     if (compressConfig.value.quality[role] === oldVal) {
@@ -359,6 +341,7 @@ watch(() => compressConfig.value.quality.default, (newVal, oldVal) => {
 
 // When the default max_width changes, update any role override that matched the old default
 watch(() => compressConfig.value.max_width.default, (newVal, oldVal) => {
+  if (!settingsLoaded.value) return
   if (oldVal === undefined) return
   for (const role of ROLE_ORDER) {
     if (compressConfig.value.max_width[role] === oldVal) {
@@ -391,7 +374,8 @@ const typeBadgeClass = computed(() => {
 async function loadInstance() {
   try {
     instance.value = await getInstance(instanceId.value)
-  } catch {
+  } catch (e) {
+    console.warn('Failed to load instance:', e)
     router.push('/instances')
   }
 }
@@ -408,15 +392,19 @@ async function loadSettings() {
       if (s.backup !== undefined) compressConfig.value.backup = s.backup
       if (s.lock_plex !== undefined) compressConfig.value.lock_plex = s.lock_plex
     }
-  } catch {
+  } catch (e) {
+    console.warn('Failed to load settings, using defaults:', e)
     // settings may not be available yet
+  } finally {
+    nextTick(() => { settingsLoaded.value = true })
   }
 }
 
 async function loadStats() {
   try {
     stats.value = await getInstanceStats(instanceId.value)
-  } catch {
+  } catch (e) {
+    console.warn('Failed to load stats:', e)
     // stats may not be available
   }
 }
@@ -426,12 +414,12 @@ function onFilterChange(filters: any) {
   mediaStore.setFilter('type', filters.type)
   if (filters.compressed !== undefined) mediaStore.setFilter('compressed', filters.compressed)
   if (filters.locked !== undefined) mediaStore.setFilter('locked', filters.locked)
-  mediaStore.fetchItems(instanceId.value)
+  mediaStore.fetchItems(instanceId.value) // clears selection (default preserveSelection=false)
 }
 
 function handlePageChange(page: number) {
   mediaStore.setPage(page)
-  mediaStore.fetchItems(instanceId.value)
+  mediaStore.fetchItems(instanceId.value, true) // preserve selection on page change
 }
 
 function handleSort(field: string, order: 'asc' | 'desc') {
@@ -446,6 +434,45 @@ async function handleCompress(ids: string[]) {
   await loadSettings()
   showCompressModal.value = true
 }
+
+function handleModalKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') {
+    showCompressModal.value = false
+  }
+  if (e.key !== 'Tab') return
+
+  const modal = document.querySelector('[role="dialog"]')
+  if (!modal) return
+
+  const focusable = modal.querySelectorAll<HTMLElement>(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  )
+  if (focusable.length === 0) return
+
+  const first = focusable[0]
+  const last = focusable[focusable.length - 1]
+
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault()
+    last.focus()
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault()
+    first.focus()
+  }
+}
+
+// Focus trap when modal opens
+watch(showCompressModal, (val) => {
+  if (val) {
+    nextTick(() => {
+      const modal = document.querySelector('[role="dialog"]')
+      if (modal) {
+        const first = modal.querySelector<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+        if (first) first.focus()
+      }
+    })
+  }
+})
 
 async function startCompression() {
   const config = { ...compressConfig.value }

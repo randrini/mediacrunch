@@ -130,8 +130,8 @@ type CompressionJob struct {
 	Config         JobConfig  `json:"config"`
 	TotalItems     int        `json:"total_items"`
 	ProcessedItems int        `json:"processed_items"`
-	TotalImages    int        `json:"total_images"`
-	ProcessedImages int       `json:"processed_images"`
+	TotalImages    int64      `json:"total_images"`
+	ProcessedImages int64     `json:"processed_images"`
 	SavedBytes     int64      `json:"saved_bytes"`
 	ErrorCount     int        `json:"error_count"`
 	SkipCount      int        `json:"skip_count"`

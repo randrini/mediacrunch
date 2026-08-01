@@ -1,11 +1,14 @@
 package api
 
 import (
+	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 
 	"github.com/mediacrunch/mediacrunch/internal/cache"
 	"github.com/mediacrunch/mediacrunch/internal/compressor"
@@ -14,12 +17,42 @@ import (
 	"github.com/mediacrunch/mediacrunch/internal/scanner"
 )
 
+var visitors = make(map[string]*rate.Limiter)
+var mu sync.Mutex
+
+func getLimiter(ip string) *rate.Limiter {
+	mu.Lock()
+	defer mu.Unlock()
+	if v, exists := visitors[ip]; exists {
+		return v
+	}
+	limiter := rate.NewLimiter(30, 10) // 30 requests/sec, burst 10
+	visitors[ip] = limiter
+	return limiter
+}
+
+func rateLimitMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		limiter := getLimiter(c.ClientIP())
+		if !limiter.Allow() {
+			c.JSON(http.StatusTooManyRequests, gin.H{"error": "rate limit exceeded"})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+
 // NewRouter creates and configures the Gin router with all API routes.
 func NewRouter(database *db.DB) *gin.Engine {
 	router := gin.Default()
 
 	// CORS middleware for development
 	router.Use(corsMiddleware())
+
+	// Rate limiting middleware on API routes
+	api := router.Group("/api")
+	api.Use(rateLimitMiddleware())
 
 	// Initialize cache, logger, and handlers
 	cacheStore := cache.New(5 * time.Minute)
@@ -33,7 +66,6 @@ func NewRouter(database *db.DB) *gin.Engine {
 	statsHandler := NewStatsHandler(database, cacheStore)
 
 	// API routes
-	api := router.Group("/api")
 	{
 		// Health
 		api.GET("/health", HealthCheck)

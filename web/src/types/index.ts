@@ -13,6 +13,7 @@ export interface InstanceSettings {
   quality?: Record<string, number>;     // role → JPEG quality (1-100)
   max_width?: Record<string, number>;   // role → max pixel width (100-8000)
   min_saving_kb?: number;              // skip if savings < this (>= 0)
+  // Note: backend uses int64, but JS number (float64) is safe for values < 2^53
   min_size_kb?: Record<string, number>; // role → minimum size threshold (KB)
   backup?: boolean;                     // create .bak before overwriting
   lock_plex?: boolean;                 // auto-lock Plex metadata before compress
@@ -90,6 +91,8 @@ export interface Stats {
   total_items: number;
   total_size: number;
   total_savings: number;
+  total_images?: number;
+  compressed_items?: number;
 }
 
 export interface TestConnectionResponse {

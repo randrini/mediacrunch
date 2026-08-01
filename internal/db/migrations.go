@@ -1,6 +1,9 @@
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+	"strings"
+)
 
 const migrationCreateTables = `
 CREATE TABLE IF NOT EXISTS instances (
@@ -8,7 +11,7 @@ CREATE TABLE IF NOT EXISTS instances (
   type TEXT NOT NULL CHECK(type IN ('radarr','sonarr','plex')),
   name TEXT NOT NULL,
   host TEXT NOT NULL,
-  api_key TEXT NOT NULL,
+  api_key TEXT NOT NULL, -- TODO: encrypt api_key at rest
   path_prefix TEXT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -138,6 +141,11 @@ func RunMigrations(db *sql.DB) error {
 		}
 	}
 
+	// Add ON DELETE CASCADE to compression_results.media_item_id FK
+	if err := migrateCompressionResultsCascade(db); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -196,6 +204,45 @@ func migrateConstraint(db *sql.DB) error {
 			FROM media_items;
 		DROP TABLE media_items;
 		ALTER TABLE media_items_new RENAME TO media_items;
+	`)
+	return err
+}
+
+// migrateCompressionResultsCascade adds ON DELETE CASCADE to the
+// compression_results.media_item_id foreign key by recreating the table.
+func migrateCompressionResultsCascade(db *sql.DB) error {
+	// Check if the FK already has CASCADE by inspecting the CREATE TABLE SQL
+	row := db.QueryRow(`SELECT sql FROM sqlite_master WHERE type='table' AND name='compression_results'`)
+	var createSQL string
+	if err := row.Scan(&createSQL); err != nil {
+		return nil // table might not exist yet
+	}
+	if strings.Contains(createSQL, "ON DELETE CASCADE") {
+		return nil // already migrated
+	}
+
+	// Recreate table with ON DELETE CASCADE on the media_item_id FK
+	_, err := db.Exec(`
+		CREATE TABLE compression_results_new (
+			id TEXT PRIMARY KEY,
+			job_id TEXT NOT NULL REFERENCES compression_jobs(id) ON DELETE CASCADE,
+			media_item_id TEXT NOT NULL REFERENCES media_items(id) ON DELETE CASCADE,
+			image_path TEXT NOT NULL,
+			role TEXT NOT NULL,
+			original_bytes INTEGER NOT NULL,
+			new_bytes INTEGER NOT NULL,
+			saved_bytes INTEGER NOT NULL,
+			status TEXT NOT NULL,
+			skip_reason TEXT,
+			error TEXT,
+			new_width INTEGER,
+			new_height INTEGER,
+			new_format TEXT,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		);
+		INSERT INTO compression_results_new SELECT * FROM compression_results;
+		DROP TABLE compression_results;
+		ALTER TABLE compression_results_new RENAME TO compression_results;
 	`)
 	return err
 }

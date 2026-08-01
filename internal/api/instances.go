@@ -198,15 +198,27 @@ func (h *InstanceHandler) DeleteInstance(c *gin.Context) {
 	id := c.Param("id")
 
 	// Delete compression results for media items of this instance
-	_, _ = h.DB.Exec(`
+	_, err := h.DB.Exec(`
 		DELETE FROM compression_results WHERE media_item_id IN (SELECT id FROM media_items WHERE instance_id = ?)
 	`, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete compression results"})
+		return
+	}
 
 	// Delete media items
-	_, _ = h.DB.Exec(`DELETE FROM media_items WHERE instance_id = ?`, id)
+	_, err = h.DB.Exec(`DELETE FROM media_items WHERE instance_id = ?`, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete media items"})
+		return
+	}
 
 	// Delete compression jobs
-	_, _ = h.DB.Exec(`DELETE FROM compression_jobs WHERE instance_id = ?`, id)
+	_, err = h.DB.Exec(`DELETE FROM compression_jobs WHERE instance_id = ?`, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete compression jobs"})
+		return
+	}
 
 	// Delete instance
 	result, err := h.DB.Exec(`DELETE FROM instances WHERE id = ?`, id)
@@ -241,9 +253,11 @@ func (h *InstanceHandler) ScanInstance(c *gin.Context) {
 		return
 	}
 
-	// Run scan in background with detached context (not tied to HTTP request)
+	// Run scan in background with timeout context
 	go func() {
-		_, err := h.Scanner.Scan(context.Background(), inst)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+		defer cancel()
+		_, err := h.Scanner.Scan(ctx, inst)
 		if err != nil {
 			fmt.Printf("ERROR scanning instance %s: %v\n", inst.Name, err)
 		}

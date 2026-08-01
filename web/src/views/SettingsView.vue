@@ -269,6 +269,7 @@ import { useRoute } from 'vue-router'
 import { useInstancesStore } from '../composables/useInstances'
 import { useSettingsStore } from '../composables/useSettings'
 import type { Instance, InstanceSettings } from '../types'
+import { ROLE_DEFAULTS } from '../constants/defaults'
 
 const route = useRoute()
 const instancesStore = useInstancesStore()
@@ -292,16 +293,6 @@ interface SettingsForm {
 interface Toast {
   type: 'success' | 'error'
   message: string
-}
-
-const ROLE_DEFAULTS: {
-  quality: Record<string, number>
-  max_width: Record<string, number>
-  min_size_kb: Record<string, number>
-} = {
-  quality: { default: 82, poster: 82, fanart: 82, season_poster: 82, banner: 85, clearLogo: 90 },
-  max_width: { default: 1920, poster: 1000, season_poster: 1000 },
-  min_size_kb: { default: 30, poster: 50, fanart: 75, season_poster: 50, banner: 15, clearLogo: 10 },
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -468,6 +459,7 @@ function resetInstance(id: string) {
 }
 
 // Update forms if settings are fetched/refreshed externally, but only for cards that haven't been edited
+// Only update form when user hasn't made changes (dirty guard prevents infinite loop)
 watch(() => settingsStore.settings, (newSettings) => {
   for (const [id, settings] of Object.entries(newSettings)) {
     if (dirty[id]) continue

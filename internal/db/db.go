@@ -27,10 +27,7 @@ func Open(dataDir string) (*DB, error) {
 		return nil, fmt.Errorf("open database: %w", err)
 	}
 
-	// Enable WAL mode and foreign keys explicitly
-	if _, err := db.Exec("PRAGMA journal_mode=WAL"); err != nil {
-		return nil, fmt.Errorf("enable WAL: %w", err)
-	}
+	// Enable foreign keys explicitly (WAL is set via DSN)
 	if _, err := db.Exec("PRAGMA foreign_keys=ON"); err != nil {
 		return nil, fmt.Errorf("enable foreign keys: %w", err)
 	}

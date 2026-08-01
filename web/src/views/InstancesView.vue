@@ -135,7 +135,13 @@ function closeForm() {
   editingInstance.value = null
 }
 
-async function handleSave(data: Partial<Instance>) {
+async function handleSave(data: {
+  type: 'radarr' | 'sonarr' | 'plex'
+  name: string
+  host: string
+  api_key: string
+  path_prefix: string
+}) {
   try {
     if (editingInstance.value) {
       await store.updateInstance(editingInstance.value.id, data)

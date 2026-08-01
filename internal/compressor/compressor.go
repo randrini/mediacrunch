@@ -9,6 +9,7 @@ import (
 	"image/png"
 	"io"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"github.com/disintegration/imaging"
@@ -69,7 +70,7 @@ func (c *Compressor) RunCompressionJob(ctx context.Context, job *models.Compress
 
 	// Count total images across all items for progress tracking
 	for _, item := range items {
-		job.TotalImages += item.TotalImages
+		job.TotalImages += int64(item.TotalImages)
 	}
 	c.updateJob(job)
 
@@ -116,7 +117,7 @@ func (c *Compressor) compressItem(ctx context.Context, instance models.Instance,
 		}
 
 		result := c.compressSingleImage(job, item, img, i)
-		job.ProcessedImages++
+		atomic.AddInt64(&job.ProcessedImages, 1)
 		// Update job progress every 10 images or on every image if few remain
 		if job.ProcessedImages%10 == 0 || job.ProcessedImages == job.TotalImages {
 			c.updateJob(job)
@@ -128,7 +129,7 @@ func (c *Compressor) compressItem(ctx context.Context, instance models.Instance,
 			item.Images[i].Format = result.NewFormat
 			totalNewSize += result.NewBytes
 			imagesUpdated = true
-			job.SavedBytes += result.SavedBytes
+			atomic.AddInt64(&job.SavedBytes, result.SavedBytes)
 		} else if result.Status == "skipped" {
 			totalNewSize += img.SizeBytes
 			job.SkipCount++
@@ -243,7 +244,7 @@ func (c *Compressor) compressSingleImage(job *models.CompressionJob, item models
 
 	// Backup original if requested
 	if job.Config.Backup {
-		backupPath := img.Path + ".bak"
+		backupPath := img.Path + ".bak." + job.ID
 		if _, err := os.Stat(backupPath); os.IsNotExist(err) {
 			if err := copyFile(img.Path, backupPath); err != nil {
 				result.Error = fmt.Sprintf("backup: %v", err)

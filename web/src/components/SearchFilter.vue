@@ -19,6 +19,7 @@
     <!-- Type filter -->
     <select
       v-model="typeFilter"
+      aria-label="Filter by type"
       class="bg-elevated border border-white/[0.06] rounded px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent"
     >
       <option value="">All Types</option>
@@ -32,22 +33,24 @@
     <!-- Compressed filter -->
     <select
       v-model="compressedFilter"
+      aria-label="Filter by compression status"
       class="bg-elevated border border-white/[0.06] rounded px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent"
     >
       <option value="">All Status</option>
-      <option :value="1">Compressed</option>
-      <option :value="0">Not Compressed</option>
+      <option :value="'1'">Compressed</option>
+      <option :value="'0'">Not Compressed</option>
     </select>
 
     <!-- Locked filter (plex only) -->
     <select
       v-if="showLockFilter"
       v-model="lockedFilter"
+      aria-label="Filter by lock status"
       class="bg-elevated border border-white/[0.06] rounded px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent"
     >
       <option value="">All Lock</option>
-      <option :value="1">Locked</option>
-      <option :value="0">Unlocked</option>
+      <option :value="'1'">Locked</option>
+      <option :value="'0'">Unlocked</option>
     </select>
 
 
@@ -66,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 
 defineProps<{
   showLockFilter?: boolean
@@ -76,15 +79,15 @@ const emit = defineEmits<{
   filterChange: [filters: {
     search?: string
     type?: string
-    compressed?: number | undefined
-    locked?: number | undefined
+    compressed?: '0' | '1' | undefined
+    locked?: '0' | '1' | undefined
   }]
 }>()
 
 const searchText = ref('')
 const typeFilter = ref('')
-const compressedFilter = ref<number | undefined>(undefined)
-const lockedFilter = ref<number | undefined>(undefined)
+const compressedFilter = ref<'0' | '1' | undefined>(undefined)
+const lockedFilter = ref<'0' | '1' | undefined>(undefined)
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -111,5 +114,12 @@ watch([searchText, typeFilter, compressedFilter, lockedFilter], () => {
 
 onMounted(() => {
   emitFilters()
+})
+
+onUnmounted(() => {
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+    debounceTimer = null
+  }
 })
 </script>

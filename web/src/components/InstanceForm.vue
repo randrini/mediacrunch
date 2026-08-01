@@ -215,7 +215,13 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  save: [data: Partial<Instance>]
+  save: [data: {
+    type: 'radarr' | 'sonarr' | 'plex'
+    name: string
+    host: string
+    api_key: string
+    path_prefix: string
+  }]
   cancel: []
 }>()
 
@@ -230,9 +236,15 @@ const plexAuthLoading = ref(false)
 const plexToken = ref('')
 const plexUsername = ref('')
 
-const form = ref<Partial<Instance>>({
+const form = ref<{
+  name: string
+  type: 'radarr' | 'sonarr' | 'plex' | ''
+  host: string
+  api_key: string
+  path_prefix: string
+}>({
   name: '',
-  type: '' as any,
+  type: '',
   host: '',
   api_key: '',
   path_prefix: '',
@@ -289,7 +301,7 @@ watch(
     } else if (visible) {
       form.value = {
         name: '',
-        type: '' as any,
+        type: '',
         host: '',
         api_key: '',
         path_prefix: '',
@@ -393,6 +405,12 @@ function clearPlexToken() {
 
 function handleSubmit() {
   if (!isValid.value) return
-  emit('save', { ...form.value })
+  emit('save', {
+    type: form.value.type as 'radarr' | 'sonarr' | 'plex',
+    name: form.value.name,
+    host: form.value.host,
+    api_key: form.value.api_key,
+    path_prefix: form.value.path_prefix,
+  })
 }
 </script>

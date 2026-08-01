@@ -37,7 +37,13 @@ export const useInstancesStore = defineStore('instances', () => {
     }
   }
 
-  async function createInstance(data: Partial<Instance>) {
+  async function createInstance(data: {
+    type: 'radarr' | 'sonarr' | 'plex'
+    name: string
+    host: string
+    api_key: string
+    path_prefix: string
+  }) {
     const instance = await apiCreateInstance(data)
     instances.value.push(instance)
     return instance

@@ -1,5 +1,9 @@
 <template>
   <div class="min-h-screen bg-base flex flex-col">
+    <!-- Skip to main content link -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-accent focus:text-white focus:px-4 focus:py-2 focus:rounded">
+      Skip to main content
+    </a>
     <!-- Top Nav -->
     <nav class="sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-white/[0.06]">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,6 +54,7 @@
               v-if="instances.length > 0"
               v-model="selectedInstanceId"
               @change="onInstanceChange"
+              aria-label="Select instance"
               class="bg-elevated/80 text-slate-100 border border-white/[0.06] rounded px-2.5 py-1 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent"
             >
               <option value="" disabled>Select instance...</option>

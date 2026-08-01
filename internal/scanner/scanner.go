@@ -4,10 +4,16 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"sync"
 
 	"github.com/mediacrunch/mediacrunch/internal/db"
 	"github.com/mediacrunch/mediacrunch/internal/logger"
 	"github.com/mediacrunch/mediacrunch/internal/models"
+)
+
+var (
+	scanMu   sync.Mutex
+	scanning = make(map[string]bool)
 )
 
 // Scanner defines the interface for scanning media items from an instance.
@@ -38,6 +44,19 @@ type existingItem struct {
 
 // Scan dispatches to the correct scanner implementation and upserts results.
 func (d *Dispatcher) Scan(ctx context.Context, instance models.Instance) ([]models.MediaItem, error) {
+	scanMu.Lock()
+	if scanning[instance.ID] {
+		scanMu.Unlock()
+		return nil, fmt.Errorf("scan already in progress for instance %s", instance.ID)
+	}
+	scanning[instance.ID] = true
+	scanMu.Unlock()
+	defer func() {
+		scanMu.Lock()
+		delete(scanning, instance.ID)
+		scanMu.Unlock()
+	}()
+
 	d.Logger.Infof("scanner", instance.ID, "Scan started for %s (%s)", instance.Name, instance.Type)
 
 	var s Scanner
@@ -84,10 +103,28 @@ func (d *Dispatcher) Scan(ctx context.Context, instance models.Instance) ([]mode
 	// Build a set of scanned paths for stale-item detection
 	scannedPaths := make(map[string]struct{}, len(items))
 
-	var matched, newCount, resetCount int
+	var newCount, resetCount int
+
+	// Deduplicate items by path
+	seen := make(map[string]bool)
+	var dedupedItems []models.MediaItem
+	for _, item := range items {
+		if seen[item.Path] {
+			continue
+		}
+		seen[item.Path] = true
+		dedupedItems = append(dedupedItems, item)
+	}
+	items = dedupedItems
 
 	// Upsert each scanned item
 	for i := range items {
+		select {
+		case <-ctx.Done():
+			return items, ctx.Err()
+		default:
+		}
+
 		item := &items[i]
 		scannedPaths[item.Path] = struct{}{}
 
@@ -98,7 +135,6 @@ func (d *Dispatcher) Scan(ctx context.Context, instance models.Instance) ([]mode
 
 		existing, wasExisting := existingItems[item.Path]
 		if wasExisting {
-			matched++
 			// Preserve the existing ID so compression_results FK references stay valid
 			item.ID = existing.ID
 
@@ -166,7 +202,7 @@ func (d *Dispatcher) Scan(ctx context.Context, instance models.Instance) ([]mode
 			_, err = d.DB.Exec(`
 				INSERT INTO media_items (id, instance_id, media_type, title, year, remote_id, path, images, total_size, total_images, compressed, locked, scanned_at)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-			`, item.ID, item.InstanceID, item.MediaType, item.Year, item.RemoteID, item.Path, imagesJSON, item.TotalSize, item.TotalImages, boolToInt(item.Compressed), lockedVal)
+			`, item.ID, item.InstanceID, item.MediaType, item.Title, item.Year, item.RemoteID, item.Path, imagesJSON, item.TotalSize, item.TotalImages, boolToInt(item.Compressed), lockedVal)
 			if err != nil {
 				return nil, fmt.Errorf("insert media item %s: %w", item.Title, err)
 			}
@@ -176,6 +212,11 @@ func (d *Dispatcher) Scan(ctx context.Context, instance models.Instance) ([]mode
 	// Delete stale items that exist in DB but were not in the scan results
 	var removedCount int
 	for path, ei := range existingItems {
+		select {
+		case <-ctx.Done():
+			return items, ctx.Err()
+		default:
+		}
 		if _, found := scannedPaths[path]; !found {
 			_, err := d.DB.Exec(`DELETE FROM compression_results WHERE media_item_id = ?`, ei.ID)
 			if err != nil {
@@ -199,7 +240,7 @@ func (d *Dispatcher) Scan(ctx context.Context, instance models.Instance) ([]mode
 	}
 
 	d.Logger.Infof("scanner", instance.ID, "Scan completed: %d items, %d images, %d bytes total", itemCount, imageCount, totalSize)
-	d.Logger.Infof("scanner", instance.ID, "Scan upsert: %d items matched, %d new, %d removed, %d compression resets (source replaced files)", matched, newCount, removedCount, resetCount)
+	d.Logger.Infof("scanner", instance.ID, "Scan upsert: %d items matched, %d new, %d removed, %d compression resets (source replaced files)", len(items)-newCount, newCount, removedCount, resetCount)
 
 	return items, nil
 }

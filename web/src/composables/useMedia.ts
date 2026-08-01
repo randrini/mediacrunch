@@ -14,6 +14,8 @@ export const useMediaStore = defineStore('media', () => {
   const selectedIds = ref<Set<string>>(new Set())
   const lastSelectedId = ref<string | null>(null)
 
+  let fetchId = 0
+
   const filters = ref<MediaQueryParams>({
     type: undefined,
     search: undefined,
@@ -27,7 +29,8 @@ export const useMediaStore = defineStore('media', () => {
     items.value.filter((i) => selectedIds.value.has(i.id))
   )
 
-  async function fetchItems(instanceId: string) {
+  async function fetchItems(instanceId: string, preserveSelection = false) {
+    const currentFetchId = ++fetchId
     loading.value = true
     error.value = null
     try {
@@ -43,13 +46,15 @@ export const useMediaStore = defineStore('media', () => {
         }
       })
       const result: PaginatedResponse<MediaItem> = await getMediaItems(instanceId, params)
+      if (currentFetchId !== fetchId) return // stale response, discard
       items.value = result.items
       total.value = result.total
       page.value = result.page
       perPage.value = result.per_page
       totalPages.value = result.total_pages
-      selectedIds.value = new Set()
+      if (!preserveSelection) selectedIds.value = new Set()
     } catch (e: any) {
+      if (currentFetchId !== fetchId) return // stale error, discard
       error.value = e?.response?.data?.error || e?.message || 'Failed to fetch media items'
     } finally {
       loading.value = false
@@ -60,7 +65,7 @@ export const useMediaStore = defineStore('media', () => {
     page.value = p
   }
 
-  function setFilter(key: keyof MediaQueryParams, value: any) {
+  function setFilter<K extends keyof MediaQueryParams>(key: K, value: MediaQueryParams[K]) {
     filters.value[key] = value
     page.value = 1
   }

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -64,6 +65,28 @@ func (h *CompressHandler) StartCompression(c *gin.Context) {
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"error": "instance not found"})
 		return
+	}
+
+	// Verify all media items belong to the instance
+	if len(input.MediaItemIDs) > 0 {
+		placeholders := make([]string, len(input.MediaItemIDs))
+		args := make([]interface{}, len(input.MediaItemIDs)+1)
+		for i, id := range input.MediaItemIDs {
+			placeholders[i] = "?"
+			args[i] = id
+		}
+		args[len(input.MediaItemIDs)] = input.InstanceID
+		query := "SELECT COUNT(*) FROM media_items WHERE id IN (" + strings.Join(placeholders, ",") + ") AND instance_id = ?"
+		var count int
+		err = h.DB.QueryRow(query, args...).Scan(&count)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate media items"})
+			return
+		}
+		if count != len(input.MediaItemIDs) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Some media items do not belong to this instance"})
+			return
+		}
 	}
 
 	// Fetch instance settings for merging
@@ -350,6 +373,10 @@ func (h *CompressHandler) getJobByID(id string) (models.CompressionJob, error) {
 // mergeSettings merges per-instance settings into the job config as defaults.
 // Request values always take precedence over instance settings.
 // Instance settings take precedence over global defaults.
+// All roles are accepted because:
+//   - Radarr/Sonarr only produce poster/fanart/banner/clearLogo
+//   - Plex produces all roles
+//   - Unused role settings are harmless no-ops
 func mergeSettings(req models.JobConfig, instSettings models.InstanceSettings) models.JobConfig {
 	out := models.JobConfig{
 		Quality:  make(map[string]int),

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"image"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -165,7 +166,7 @@ func (s *ArrScanner) walkMediaCoverDir(dir string, mediaType string) []models.Im
 
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		fmt.Printf("DEBUG: cannot read MediaCover dir %s: %v\n", dir, err)
+		log.Printf("[scanner] warning: failed to read media cover directory %s: %v", dir, err)
 		return images
 	}
 

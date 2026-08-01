@@ -27,7 +27,13 @@ export function getInstance(id: string): Promise<Instance> {
   return api.get(`/instances/${id}`).then((r) => r.data)
 }
 
-export function createInstance(data: Partial<Instance>): Promise<Instance> {
+export function createInstance(data: {
+  type: 'radarr' | 'sonarr' | 'plex'
+  name: string
+  host: string
+  api_key: string
+  path_prefix: string
+}): Promise<Instance> {
   return api.post('/instances', data).then((r) => r.data)
 }
 
@@ -85,8 +91,8 @@ export interface MediaQueryParams {
   order?: string
   page?: number
   per_page?: number
-  compressed?: number
-  locked?: number
+  compressed?: '0' | '1'
+  locked?: '0' | '1'
 }
 
 export function getMediaItems(
