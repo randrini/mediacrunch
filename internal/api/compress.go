@@ -42,18 +42,24 @@ func NewCompressHandler(database *db.DB, comp *compressor.Compressor, c *cache.C
 	}
 }
 
+// compressRequest is the body of POST /api/compress.
+// Pointer fields (Backup, LockPlex, MinSavingKB) distinguish "explicitly set"
+// (including false/0) from "absent" so the merge cascade can honor request
+// values that disable an instance default.
+type compressRequest struct {
+	InstanceID   string            `json:"instance_id" binding:"required"`
+	MediaItemIDs []string          `json:"media_item_ids"`
+	Quality      map[string]int    `json:"quality"`
+	MaxWidth     map[string]int    `json:"max_width"`
+	MinSizeKB    map[string]int64  `json:"min_size_kb"`
+	Backup       *bool             `json:"backup"`
+	MinSavingKB  *int64            `json:"min_saving_kb"`
+	LockPlex     *bool             `json:"lock_plex"`
+}
+
 // StartCompression handles POST /api/compress
 func (h *CompressHandler) StartCompression(c *gin.Context) {
-	var input struct {
-		InstanceID   string         `json:"instance_id" binding:"required"`
-		MediaItemIDs []string       `json:"media_item_ids"`
-		Quality      map[string]int `json:"quality"`
-		MaxWidth     map[string]int `json:"max_width"`
-		MinSizeKB    map[string]int64 `json:"min_size_kb"`
-		Backup       bool           `json:"backup"`
-		MinSavingKB  int64          `json:"min_saving_kb"`
-		LockPlex     bool           `json:"lock_plex"`
-	}
+	var input compressRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -101,15 +107,7 @@ func (h *CompressHandler) StartCompression(c *gin.Context) {
 	}
 
 	// Build job config with instance settings as defaults
-	config := models.JobConfig{
-		Quality:     input.Quality,
-		MaxWidth:    input.MaxWidth,
-		MinSizeKB:   input.MinSizeKB,
-		Backup:      input.Backup,
-		MinSavingKB: input.MinSavingKB,
-		LockPlex:    input.LockPlex,
-	}
-	config = mergeSettings(config, instanceSettings)
+	config := mergeSettings(input, instanceSettings)
 
 	configJSON, err := json.Marshal(config)
 	if err != nil {
@@ -377,7 +375,7 @@ func (h *CompressHandler) getJobByID(id string) (models.CompressionJob, error) {
 //   - Radarr/Sonarr only produce poster/fanart/banner/clearLogo
 //   - Plex produces all roles
 //   - Unused role settings are harmless no-ops
-func mergeSettings(req models.JobConfig, instSettings models.InstanceSettings) models.JobConfig {
+func mergeSettings(req compressRequest, instSettings models.InstanceSettings) models.JobConfig {
 	out := models.JobConfig{
 		Quality:  make(map[string]int),
 		MaxWidth: make(map[string]int),
@@ -447,7 +445,9 @@ func mergeSettings(req models.JobConfig, instSettings models.InstanceSettings) m
 		}
 	}
 
-	// MinSizeKB: request > instance > default
+	// MinSizeKB: request > instance > default.
+	// Presence in the map (not a non-zero sentinel) decides precedence, so an
+	// explicit 0 in the request disables the threshold for that role.
 	allMinSizeKeys := make(map[string]bool)
 	for k := range req.MinSizeKB {
 		allMinSizeKeys[k] = true
@@ -468,42 +468,55 @@ func mergeSettings(req models.JobConfig, instSettings models.InstanceSettings) m
 
 	for k := range allMinSizeKeys {
 		switch {
-		case req.MinSizeKB != nil && req.MinSizeKB[k] != 0:
-			out.MinSizeKB[k] = req.MinSizeKB[k]
-		case instSettings.MinSizeKB != nil && instSettings.MinSizeKB[k] != 0:
-			out.MinSizeKB[k] = instSettings.MinSizeKB[k]
-		case defaultMinSizeKB[k] != 0:
-			out.MinSizeKB[k] = defaultMinSizeKB[k]
+		case req.MinSizeKB != nil:
+			if v, ok := req.MinSizeKB[k]; ok {
+				out.MinSizeKB[k] = v
+				continue
+			}
+			fallthrough
+		case instSettings.MinSizeKB != nil:
+			if v, ok := instSettings.MinSizeKB[k]; ok {
+				out.MinSizeKB[k] = v
+				continue
+			}
+			fallthrough
 		default:
-			out.MinSizeKB[k] = 30
+			if v, ok := defaultMinSizeKB[k]; ok {
+				out.MinSizeKB[k] = v
+			} else {
+				out.MinSizeKB[k] = 30
+			}
 		}
 	}
 
-	// Backup: request > instance > false
+	// Backup: request (explicit, incl. false) > instance > false.
+	// The request uses a pointer so an explicit false can override an instance
+	// default of true.
 	switch {
-	case req.Backup:
-		out.Backup = true
-	case instSettings.Backup != nil && *instSettings.Backup:
-		out.Backup = true
+	case req.Backup != nil:
+		out.Backup = *req.Backup
+	case instSettings.Backup != nil:
+		out.Backup = *instSettings.Backup
 	default:
 		out.Backup = false
 	}
 
-	// LockPlex: request > instance > false
+	// LockPlex: request (explicit, incl. false) > instance > false.
 	switch {
-	case req.LockPlex:
-		out.LockPlex = true
-	case instSettings.LockPlex != nil && *instSettings.LockPlex:
-		out.LockPlex = true
+	case req.LockPlex != nil:
+		out.LockPlex = *req.LockPlex
+	case instSettings.LockPlex != nil:
+		out.LockPlex = *instSettings.LockPlex
 	default:
 		out.LockPlex = false
 	}
 
-	// MinSavingKB: request > instance > 50
+	// MinSavingKB: request (explicit, incl. 0) > instance > 50.
+	// An explicit 0 in the request disables the minimum-savings gate.
 	switch {
-	case req.MinSavingKB > 0:
-		out.MinSavingKB = req.MinSavingKB
-	case instSettings.MinSavingKB != nil && *instSettings.MinSavingKB > 0:
+	case req.MinSavingKB != nil:
+		out.MinSavingKB = *req.MinSavingKB
+	case instSettings.MinSavingKB != nil:
 		out.MinSavingKB = *instSettings.MinSavingKB
 	default:
 		out.MinSavingKB = 50

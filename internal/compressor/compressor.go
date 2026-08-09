@@ -296,8 +296,9 @@ func (c *Compressor) compressSingleImage(job *models.CompressionJob, item models
 
 	// Check minimum saving
 	minSaving := job.Config.MinSavingKB * 1024
-	if minSaving <= 0 {
-		minSaving = 50 * 1024
+	// min_saving_kb of 0 disables the minimum-savings gate entirely
+	if minSaving < 0 {
+		minSaving = 0
 	}
 
 	// For PNG: since PNG re-encoding is lossless, only replace if the file is actually smaller
