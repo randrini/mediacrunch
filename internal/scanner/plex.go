@@ -26,6 +26,7 @@ type plexTitleInfo struct {
 	MediaType  int // 1=movie, 2=show, 3=season, 4=episode, 9=collection
 	GUID       string
 	RatingKey  string
+	Deleted    bool // true if the metadata item was deleted (orphaned bundle on disk)
 }
 
 // PlexScanner scans Plex Media Server instances.
@@ -47,7 +48,7 @@ func (s *PlexScanner) Scan(ctx context.Context, instance models.Instance) ([]mod
 	// The Plex DB hash is SHA1(guid), and the bundle path is hash[0]/hash[1:].bundle
 	hashToInfo := map[string]plexTitleInfo{}
 	for rk, info := range titleMap {
-		if info.GUID != "" {
+		if info.GUID != "" && !info.Deleted {
 			h := fmt.Sprintf("%x", sha1.Sum([]byte(info.GUID)))
 			hashToInfo[h] = info
 			// Also store the ratingKey-based lookup
@@ -117,6 +118,12 @@ func (s *PlexScanner) Scan(ctx context.Context, instance models.Instance) ([]mod
 					title = info.Title
 					year = info.Year
 					ratingKey = info.RatingKey
+				} else {
+					// Bundle exists on disk but has no matching (non-deleted) item in the
+					// Plex DB. This is an orphaned bundle left behind when a title was
+					// removed from Plex. Skip it instead of showing the raw hash as a title.
+					fmt.Printf("SCAN: skipping orphaned bundle %s (no active Plex item)\n", fullHash)
+					continue
 				}
 
 				item := models.MediaItem{
@@ -162,7 +169,7 @@ func (s *PlexScanner) readPlexDB(pathPrefix string) map[string]plexTitleInfo {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT id, title, year, guid, metadata_type FROM metadata_items WHERE deleted_at IS NULL")
+	rows, err := db.Query("SELECT id, title, year, guid, metadata_type, deleted_at FROM metadata_items")
 	if err != nil {
 		fmt.Printf("SCAN: Cannot query Plex DB: %v\n", err)
 		return titleMap
@@ -175,7 +182,8 @@ func (s *PlexScanner) readPlexDB(pathPrefix string) map[string]plexTitleInfo {
 		var year sql.NullInt64
 		var guid string
 		var metadataType int
-		if err := rows.Scan(&id, &title, &year, &guid, &metadataType); err != nil {
+		var deletedAt sql.NullInt64
+		if err := rows.Scan(&id, &title, &year, &guid, &metadataType, &deletedAt); err != nil {
 			continue
 		}
 		y := 0
@@ -189,6 +197,7 @@ func (s *PlexScanner) readPlexDB(pathPrefix string) map[string]plexTitleInfo {
 			MediaType:  metadataType,
 			GUID:       guid,
 			RatingKey:  ratingKey,
+			Deleted:    deletedAt.Valid,
 		}
 	}
 
