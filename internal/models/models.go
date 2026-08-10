@@ -60,21 +60,45 @@ type ImageInfo struct {
 
 // MediaItem represents a movie, series, season, episode, or collection.
 type MediaItem struct {
-	ID            string      `json:"id"`
-	InstanceID    string      `json:"instance_id"`
-	MediaType     string      `json:"media_type"` // movie, series, season, episode, collection
-	Title         string      `json:"title"`
-	Year          int         `json:"year"`
-	RemoteID      string      `json:"remote_id"`
-	Path          string      `json:"path"`
-	ImagesJSON    string      `json:"-"` // raw JSON from DB
-	Images        []ImageInfo `json:"images"`
-	TotalSize     int64       `json:"total_size"`
-	OriginalSize  int64       `json:"original_size"` // pre-compression size (0 if never compressed)
-	TotalImages   int         `json:"total_images"`
-	Compressed    bool        `json:"compressed"`
-	Locked        *bool       `json:"locked,omitempty"` // plex only
-	ScannedAt     *time.Time  `json:"scanned_at,omitempty"`
+	ID              string      `json:"id"`
+	InstanceID      string      `json:"instance_id"`
+	MediaType       string      `json:"media_type"` // movie, series, season, episode, collection
+	Title           string      `json:"title"`
+	Year            int         `json:"year"`
+	RemoteID        string      `json:"remote_id"`
+	Path            string      `json:"path"`
+	ImagesJSON      string      `json:"-"` // raw JSON from DB
+	Images          []ImageInfo `json:"images"`
+	TotalSize       int64       `json:"total_size"`
+	OriginalSize    int64       `json:"original_size"` // pre-compression size (0 if never compressed)
+	TotalImages     int         `json:"total_images"`
+	Compressed      bool        `json:"compressed"`
+	Locked          *bool       `json:"locked,omitempty"` // plex only
+	ScannedAt       *time.Time  `json:"scanned_at,omitempty"`
+	PosterSize      int64       `json:"poster_size,omitempty"`
+	FanartSize      int64       `json:"fanart_size,omitempty"`
+	ClearLogoSize   int64       `json:"clear_logo_size,omitempty"`
+	SeasonPosterSize int64      `json:"season_poster_size,omitempty"`
+	BannerSize      int64       `json:"banner_size,omitempty"`
+}
+
+// ComputeRoleSizes sums the size of every image per role into the per-role
+// size fields used by the media list UI. Must be called after UnmarshalImages.
+func (item *MediaItem) ComputeRoleSizes() {
+	for _, img := range item.Images {
+		switch img.Role {
+		case "poster":
+			item.PosterSize += img.SizeBytes
+		case "fanart":
+			item.FanartSize += img.SizeBytes
+		case "clearLogo":
+			item.ClearLogoSize += img.SizeBytes
+		case "season_poster":
+			item.SeasonPosterSize += img.SizeBytes
+		case "banner":
+			item.BannerSize += img.SizeBytes
+		}
+	}
 }
 
 // UnmarshalImages parses the images JSON column into the Images slice.

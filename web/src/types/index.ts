@@ -43,6 +43,11 @@ export interface MediaItem {
   compressed: boolean;
   locked: boolean | null;
   scanned_at: string;
+  poster_size?: number;
+  fanart_size?: number;
+  clear_logo_size?: number;
+  season_poster_size?: number;
+  banner_size?: number;
 }
 
 export interface CompressionJob {

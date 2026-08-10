@@ -59,6 +59,11 @@
               </th>
               <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Year</th>
               <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Images</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Fanart</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Poster</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Clear Logo</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Season Poster</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Banner</th>
               <th
                 class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-200"
                 @click="sortBy('original_size')"
@@ -102,13 +107,13 @@
           <tbody class="divide-y divide-white/[0.06]">
             <!-- Loading skeleton -->
             <tr v-if="loading">
-              <td v-for="i in (instanceType === 'plex' ? 11 : 10)" :key="i" class="px-3 py-2">
+              <td v-for="i in (instanceType === 'plex' ? 16 : 15)" :key="i" class="px-3 py-2">
                 <div class="h-4 bg-elevated rounded animate-pulse" :style="{ width: i === 3 ? '60%' : i === 5 ? '40%' : '80%' }" />
               </td>
             </tr>
             <!-- Empty state -->
             <tr v-else-if="items.length === 0">
-              <td :colspan="instanceType === 'plex' ? 11 : 10" class="px-3 py-12 text-center">
+              <td :colspan="instanceType === 'plex' ? 16 : 15" class="px-3 py-12 text-center">
                 <svg class="w-12 h-12 mx-auto text-slate-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -157,6 +162,26 @@
                     </div>
                   </div>
                 </div>
+              </td>
+              <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-300 font-mono">
+                <span v-if="item.fanart_size">{{ formatBytes(item.fanart_size) }}</span>
+                <span v-else class="text-slate-500">—</span>
+              </td>
+              <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-300 font-mono">
+                <span v-if="item.poster_size">{{ formatBytes(item.poster_size) }}</span>
+                <span v-else class="text-slate-500">—</span>
+              </td>
+              <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-300 font-mono">
+                <span v-if="item.clear_logo_size">{{ formatBytes(item.clear_logo_size) }}</span>
+                <span v-else class="text-slate-500">—</span>
+              </td>
+              <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-300 font-mono">
+                <span v-if="item.season_poster_size">{{ formatBytes(item.season_poster_size) }}</span>
+                <span v-else class="text-slate-500">—</span>
+              </td>
+              <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-300 font-mono">
+                <span v-if="item.banner_size">{{ formatBytes(item.banner_size) }}</span>
+                <span v-else class="text-slate-500">—</span>
               </td>
               <td class="px-3 py-2 whitespace-nowrap">
                 <span :class="sizeBadgeClass(item.compressed && item.original_size > 0 ? item.original_size : item.total_size)" class="font-mono">

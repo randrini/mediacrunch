@@ -114,11 +114,9 @@ func (h *MediaHandler) ListMedia(c *gin.Context) {
 	// Pagination
 	offset := (page - 1) * perPage
 
-	// Select columns — skip images column for list view to avoid expensive JSON unmarshalling
-	selectCols := "id, instance_id, media_type, title, year, remote_id, path, total_size, original_size, total_images, compressed, locked, scanned_at"
-	if includeImages {
-		selectCols = "id, instance_id, media_type, title, year, remote_id, path, images, total_size, original_size, total_images, compressed, locked, scanned_at"
-	}
+	// Select columns — images column is parsed server-side for per-role sizes,
+	// but the full image array is only included in the response when requested
+	selectCols := "id, instance_id, media_type, title, year, remote_id, path, images, total_size, original_size, total_images, compressed, locked, scanned_at"
 
 	query := fmt.Sprintf(`
 		SELECT %s FROM media_items WHERE %s ORDER BY %s %s LIMIT ? OFFSET ?
@@ -140,20 +138,11 @@ func (h *MediaHandler) ListMedia(c *gin.Context) {
 		var scannedAt string
 		var compressedInt int
 
-		if includeImages {
-			if err := rows.Scan(&item.ID, &item.InstanceID, &item.MediaType, &item.Title,
-				&year, &item.RemoteID, &item.Path, &item.ImagesJSON,
-				&item.TotalSize, &item.OriginalSize, &item.TotalImages, &compressedInt, &locked, &scannedAt); err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-				return
-			}
-		} else {
-			if err := rows.Scan(&item.ID, &item.InstanceID, &item.MediaType, &item.Title,
-				&year, &item.RemoteID, &item.Path,
-				&item.TotalSize, &item.OriginalSize, &item.TotalImages, &compressedInt, &locked, &scannedAt); err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-				return
-			}
+		if err := rows.Scan(&item.ID, &item.InstanceID, &item.MediaType, &item.Title,
+			&year, &item.RemoteID, &item.Path, &item.ImagesJSON,
+			&item.TotalSize, &item.OriginalSize, &item.TotalImages, &compressedInt, &locked, &scannedAt); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
 		}
 
 		if year.Valid {
@@ -168,12 +157,13 @@ func (h *MediaHandler) ListMedia(c *gin.Context) {
 		// Parse scanned_at
 		item.ScannedAt = util.ParseTimestampPtr(scannedAt)
 
-		if includeImages {
-			// Unmarshal images for the response
-			if err := item.UnmarshalImages(); err != nil {
-				item.Images = []models.ImageInfo{}
-			}
-		} else {
+		// Parse images for per-role sizes. The full array is only included in
+		// the response when requested; per-role sizes are always computed.
+		if err := item.UnmarshalImages(); err != nil {
+			item.Images = []models.ImageInfo{}
+		}
+		item.ComputeRoleSizes()
+		if !includeImages {
 			item.Images = []models.ImageInfo{}
 		}
 
