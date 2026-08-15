@@ -175,6 +175,11 @@ func (s *ArrScanner) walkMediaCoverDir(dir string, mediaType string) []models.Im
 			continue
 		}
 
+		// Skip backup files
+		if strings.Contains(entry.Name(), ".bak") {
+			continue
+		}
+
 		path := filepath.Join(dir, entry.Name())
 		info, err := entry.Info()
 		if err != nil {
@@ -205,6 +210,15 @@ func (s *ArrScanner) walkSeasonDir(dir string, seasonNumber int) []models.ImageI
 	if err != nil {
 		return images
 	}
+
+	// Filter out backup files from glob results
+	filtered := make([]string, 0, len(entries))
+	for _, path := range entries {
+		if !strings.Contains(filepath.Base(path), ".bak") {
+			filtered = append(filtered, path)
+		}
+	}
+	entries = filtered
 
 	for _, path := range entries {
 		info, err := os.Stat(path)

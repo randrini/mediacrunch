@@ -255,6 +255,11 @@ func (s *PlexScanner) walkBundle(bundlePath string) []models.ImageInfo {
 				continue
 			}
 
+			// Skip backup files (Plex native .bak and MediaCrunch .bak.{uuid} backups)
+			if strings.Contains(entry.Name(), ".bak") {
+				continue
+			}
+
 			path := filepath.Join(dir, entry.Name())
 			info, err := entry.Info()
 			if err != nil {
