@@ -56,15 +56,15 @@
     <!-- Stats -->
     <div class="mt-3 grid grid-cols-3 gap-2 text-center">
       <div class="bg-white/[0.03] rounded py-1.5 px-1">
-        <p class="text-sm font-semibold text-slate-100 font-mono tabular-nums">{{ stats?.total_items ?? '-' }}</p>
+        <p class="text-xs sm:text-sm font-semibold text-slate-100 font-mono tabular-nums">{{ stats?.total_items ?? '-' }}</p>
         <p class="text-[10px] text-slate-500 uppercase tracking-wider">Items</p>
       </div>
       <div class="bg-white/[0.03] rounded py-1.5 px-1">
-        <p class="text-sm font-semibold text-slate-100 font-mono tabular-nums">{{ stats ? formatBytes(stats.total_size) : '-' }}</p>
+        <p class="text-xs sm:text-sm font-semibold text-slate-100 font-mono tabular-nums">{{ stats ? formatBytes(stats.total_size) : '-' }}</p>
         <p class="text-[10px] text-slate-500 uppercase tracking-wider">Size</p>
       </div>
       <div class="bg-white/[0.03] rounded py-1.5 px-1">
-        <p class="text-sm font-semibold text-accent font-mono tabular-nums">{{ stats ? formatBytes(stats.total_savings) : '-' }}</p>
+        <p class="text-xs sm:text-sm font-semibold text-accent font-mono tabular-nums">{{ stats ? formatBytes(stats.total_savings) : '-' }}</p>
         <p class="text-[10px] text-slate-500 uppercase tracking-wider">Saved</p>
       </div>
     </div>

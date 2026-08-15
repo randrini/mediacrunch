@@ -16,7 +16,7 @@
               </svg>
               <span class="text-sm font-bold text-slate-100 tracking-tight font-mono">MediaCrunch</span>
             </router-link>
-            <div class="flex space-x-1">
+            <div class="hidden md:flex space-x-1">
               <router-link
                 to="/"
                 class="px-2.5 py-1 rounded text-xs font-medium transition-base"
@@ -48,26 +48,105 @@
             </div>
           </div>
 
-          <!-- Right: Instance Selector -->
-          <div class="flex items-center">
-            <select
-              v-if="instances.length > 0"
-              v-model="selectedInstanceId"
-              @change="onInstanceChange"
-              aria-label="Select instance"
-              class="bg-elevated/80 text-slate-100 border border-white/[0.06] rounded px-2.5 py-1 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent"
-            >
-              <option value="" disabled>Select instance...</option>
-              <option
-                v-for="inst in instances"
-                :key="inst.id"
-                :value="inst.id"
+          <!-- Right: Instance Selector + Hamburger -->
+          <div class="flex items-center space-x-2">
+            <div class="hidden md:block">
+              <select
+                v-if="instances.length > 0"
+                v-model="selectedInstanceId"
+                @change="onInstanceChange"
+                aria-label="Select instance"
+                class="bg-elevated/80 text-slate-100 border border-white/[0.06] rounded px-2.5 py-1 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent"
               >
-                {{ inst.name }} ({{ inst.type }})
-              </option>
-            </select>
+                <option value="" disabled>Select instance...</option>
+                <option
+                  v-for="inst in instances"
+                  :key="inst.id"
+                  :value="inst.id"
+                >
+                  {{ inst.name }} ({{ inst.type }})
+                </option>
+              </select>
+            </div>
+            <button
+              @click="mobileMenuOpen = !mobileMenuOpen"
+              class="md:hidden inline-flex items-center justify-center w-8 h-8 rounded text-slate-300 hover:text-slate-100 hover:bg-white/[0.06] transition-base"
+              aria-label="Toggle navigation menu"
+              :aria-expanded="mobileMenuOpen"
+            >
+              <svg v-if="!mobileMenuOpen" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              <svg v-else class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </div>
+
+        <!-- Mobile Menu Panel -->
+        <transition
+          enter-active-class="transition duration-200 ease-out"
+          enter-from-class="opacity-0 -translate-y-2"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition duration-150 ease-in"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 -translate-y-2"
+        >
+          <div v-show="mobileMenuOpen" class="md:hidden pb-3 pt-1 border-t border-white/[0.06]">
+            <nav class="flex flex-col space-y-1">
+              <router-link
+                to="/"
+                @click="mobileMenuOpen = false"
+                class="px-3 py-2 rounded text-sm font-medium transition-base"
+                :class="isActive('/') ? 'bg-accent/10 text-accent' : 'text-slate-300 hover:text-slate-100 hover:bg-white/[0.04]'"
+              >
+                Dashboard
+              </router-link>
+              <router-link
+                to="/instances"
+                @click="mobileMenuOpen = false"
+                class="px-3 py-2 rounded text-sm font-medium transition-base"
+                :class="isActive('/instances') ? 'bg-accent/10 text-accent' : 'text-slate-300 hover:text-slate-100 hover:bg-white/[0.04]'"
+              >
+                Instances
+              </router-link>
+              <router-link
+                to="/settings"
+                @click="mobileMenuOpen = false"
+                class="px-3 py-2 rounded text-sm font-medium transition-base"
+                :class="isActive('/settings') ? 'bg-accent/10 text-accent' : 'text-slate-300 hover:text-slate-100 hover:bg-white/[0.04]'"
+              >
+                Settings
+              </router-link>
+              <router-link
+                to="/logs"
+                @click="mobileMenuOpen = false"
+                class="px-3 py-2 rounded text-sm font-medium transition-base"
+                :class="isActive('/logs') ? 'bg-accent/10 text-accent' : 'text-slate-300 hover:text-slate-100 hover:bg-white/[0.04]'"
+              >
+                Logs
+              </router-link>
+            </nav>
+            <div v-if="instances.length > 0" class="mt-2 px-3">
+              <select
+                v-model="selectedInstanceId"
+                @change="onInstanceChange"
+                aria-label="Select instance"
+                class="w-full bg-elevated/80 text-slate-100 border border-white/[0.06] rounded px-2.5 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent"
+              >
+                <option value="" disabled>Select instance...</option>
+                <option
+                  v-for="inst in instances"
+                  :key="inst.id"
+                  :value="inst.id"
+                >
+                  {{ inst.name }} ({{ inst.type }})
+                </option>
+              </select>
+            </div>
+          </div>
+        </transition>
       </div>
     </nav>
 
@@ -103,6 +182,7 @@ const store = useInstancesStore()
 const { instances } = storeToRefs(store)
 const selectedInstanceId = ref('')
 const version = ref('')
+const mobileMenuOpen = ref(false)
 
 function isActive(path: string): boolean {
   if (path === '/') return route.path === '/'
@@ -139,6 +219,13 @@ watch(
   () => route.params.id,
   (id) => {
     selectedInstanceId.value = id ? (id as string) : ''
+  }
+)
+
+watch(
+  () => route.fullPath,
+  () => {
+    mobileMenuOpen.value = false
   }
 )
 </script>

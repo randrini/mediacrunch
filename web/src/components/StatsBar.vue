@@ -1,6 +1,6 @@
 <template>
   <div class="card-glass px-4 py-2.5">
-    <div class="flex items-center justify-around gap-3">
+    <div class="grid grid-cols-2 gap-3 md:flex md:items-center md:justify-around md:gap-3">
       <!-- Total Items -->
       <div class="flex items-center space-x-2.5">
         <div class="w-7 h-7 rounded bg-accent/10 flex items-center justify-center">
@@ -15,7 +15,7 @@
       </div>
 
       <!-- Divider -->
-      <div class="w-px h-8 bg-white/[0.06]" />
+      <div class="hidden md:block w-px h-8 bg-white/[0.06]" />
 
       <!-- Total Size -->
       <div class="flex items-center space-x-2.5">
@@ -31,7 +31,7 @@
       </div>
 
       <!-- Divider -->
-      <div class="w-px h-8 bg-white/[0.06]" />
+      <div class="hidden md:block w-px h-8 bg-white/[0.06]" />
 
       <!-- Total Saved -->
       <div class="flex items-center space-x-2.5">
@@ -47,7 +47,7 @@
       </div>
 
       <!-- Divider -->
-      <div class="w-px h-8 bg-white/[0.06]" />
+      <div class="hidden md:block w-px h-8 bg-white/[0.06]" />
 
       <!-- Savings Percentage -->
       <div class="flex items-center space-x-2.5">

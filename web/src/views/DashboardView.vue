@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Page Header -->
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
       <h1 class="text-lg font-semibold text-slate-100">Dashboard</h1>
       <button
         v-if="store.instances.length > 0"
@@ -77,34 +77,36 @@
       <div v-if="recentJobs.length > 0">
         <h2 class="text-lg font-semibold text-slate-100 mb-4">Recent Compression Jobs</h2>
         <div class="card-glass overflow-hidden">
-          <table class="min-w-full divide-y divide-white/[0.06]">
-            <thead class="bg-elevated">
-              <tr>
-                <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Instance</th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Status</th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Progress</th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Saved</th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Date</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-white/[0.06]">
-              <tr v-for="job in recentJobs" :key="job.id" class="hover:bg-elevated/50 transition-base">
-                <td class="px-3 py-2 text-sm text-slate-300">{{ getInstanceName(job.instance_id) }}</td>
-                <td class="px-3 py-2">
-                  <span :class="statusBadge(job.status)">{{ job.status }}</span>
-                </td>
-                <td class="px-3 py-2 text-sm text-slate-300 font-mono tabular-nums">
-                  {{ job.processed_items }}/{{ job.total_items }}
-                </td>
-                <td class="px-3 py-2 text-sm text-accent font-mono tabular-nums">
-                  {{ formatSize(job.saved_bytes) }}
-                </td>
-                <td class="px-3 py-2 text-sm text-slate-400">
-                  {{ formatDate(job.created_at) }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-white/[0.06]">
+              <thead class="bg-elevated">
+                <tr>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Instance</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Status</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Progress</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Saved</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Date</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/[0.06]">
+                <tr v-for="job in recentJobs" :key="job.id" class="hover:bg-elevated/50 transition-base">
+                  <td class="px-3 py-2 text-sm text-slate-300">{{ getInstanceName(job.instance_id) }}</td>
+                  <td class="px-3 py-2">
+                    <span :class="statusBadge(job.status)">{{ job.status }}</span>
+                  </td>
+                  <td class="px-3 py-2 text-sm text-slate-300 font-mono tabular-nums">
+                    {{ job.processed_items }}/{{ job.total_items }}
+                  </td>
+                  <td class="px-3 py-2 text-sm text-accent font-mono tabular-nums">
+                    {{ formatSize(job.saved_bytes) }}
+                  </td>
+                  <td class="px-3 py-2 text-sm text-slate-400">
+                    {{ formatDate(job.created_at) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

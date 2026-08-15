@@ -3,7 +3,7 @@
     <!-- Selection Bar -->
     <div
       v-if="someSelected"
-      class="bg-accent/10 border border-accent/30 rounded-lg px-4 py-2 mb-4 flex items-center justify-between"
+      class="bg-accent/10 border border-accent/30 rounded-lg px-4 py-2 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
     >
       <span class="text-sm text-slate-200">
         <template v-if="selectAllMode">
@@ -13,7 +13,7 @@
           <span class="font-semibold">{{ selectedCount }}</span> item{{ selectedCount !== 1 ? 's' : '' }} selected
         </template>
       </span>
-      <div class="flex items-center space-x-3">
+      <div class="flex items-center flex-wrap gap-3">
         <button
           v-if="!selectAllMode && selectedCount < totalItems"
           @click="$emit('selectAllAcrossPages')"
@@ -40,8 +40,8 @@
       </div>
     </div>
 
-    <!-- Table -->
-    <div class="card-glass overflow-hidden">
+    <!-- Table (desktop) -->
+    <div class="card-glass overflow-hidden hidden lg:block">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-white/[0.06]">
           <thead class="bg-elevated">
@@ -256,12 +256,106 @@
       </div>
     </div>
 
+    <!-- Card list (mobile/tablet) -->
+    <div class="lg:hidden space-y-2">
+      <!-- Loading skeleton -->
+      <div v-if="loading" class="space-y-2">
+        <div v-for="i in 4" :key="i" class="card-glass p-3">
+          <div class="h-4 bg-elevated rounded animate-pulse w-2/3 mb-2" />
+          <div class="h-3 bg-elevated rounded animate-pulse w-1/3 mb-3" />
+          <div class="h-3 bg-elevated rounded animate-pulse w-full" />
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div v-else-if="items.length === 0" class="card-glass p-8 text-center">
+        <svg class="w-12 h-12 mx-auto text-slate-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <p class="text-slate-400 text-sm">No media items found.</p>
+        <p class="text-slate-500 text-xs mt-1">Try scanning your instance.</p>
+      </div>
+
+      <!-- Data cards -->
+      <div
+        v-for="item in items"
+        :key="item.id"
+        class="card-glass p-3 relative"
+        :class="{ 'bg-accent/5 border-accent/30': selectedIds.includes(item.id) }"
+      >
+        <!-- Selection toggle (top-right) -->
+        <label class="absolute top-2.5 right-2.5 z-10 cursor-pointer" @click.stop>
+          <input
+            type="checkbox"
+            :checked="selectedIds.includes(item.id)"
+            @click="onRowCheck(item, $event)"
+            class="rounded border-white/[0.08] bg-elevated text-accent focus:ring-accent/50"
+          />
+        </label>
+
+        <!-- Title + type + year -->
+        <div class="flex items-start gap-2 pr-8">
+          <span class="text-lg leading-none" :title="item.media_type">{{ typeIcon(item.media_type) }}</span>
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-slate-100 truncate" :title="item.title">{{ item.title }}</p>
+            <p class="text-xs text-slate-500 font-mono mt-0.5">{{ item.year ?? '-' }}</p>
+          </div>
+        </div>
+
+        <!-- Key stats -->
+        <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div class="bg-white/[0.03] rounded py-1.5 px-1">
+            <p class="text-sm font-semibold text-slate-100 font-mono tabular-nums">{{ item.total_images }}</p>
+            <p class="text-[10px] text-slate-500 uppercase tracking-wider">Images</p>
+          </div>
+          <div class="bg-white/[0.03] rounded py-1.5 px-1">
+            <p class="text-sm font-semibold text-slate-100 font-mono tabular-nums">
+              {{ formatBytes(item.compressed && item.original_size > 0 ? item.original_size : item.total_size) }}
+            </p>
+            <p class="text-[10px] text-slate-500 uppercase tracking-wider">Size</p>
+          </div>
+          <div class="bg-white/[0.03] rounded py-1.5 px-1">
+            <p v-if="item.compressed && item.original_size > 0" class="text-sm font-semibold text-accent font-mono tabular-nums">
+              −{{ formatBytes(item.original_size - item.total_size) }}
+            </p>
+            <p v-else class="text-sm font-semibold text-slate-500 font-mono tabular-nums">—</p>
+            <p class="text-[10px] text-slate-500 uppercase tracking-wider">Saved</p>
+          </div>
+        </div>
+
+        <!-- Compressed badge + action -->
+        <div class="mt-3 flex items-center justify-between gap-2">
+          <span
+            v-if="item.compressed"
+            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent/10 text-accent"
+          >
+            <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            Compressed
+          </span>
+          <span v-else class="text-slate-500 text-xs">Not compressed</span>
+          <button
+            @click="$emit('compress', [item.id])"
+            :disabled="item.compressed"
+            class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded transition-base"
+            :class="item.compressed ? 'bg-elevated text-slate-500 cursor-not-allowed' : 'bg-accent-dim text-accent hover:bg-accent/20'"
+          >
+            <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+            Compress
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Pagination -->
-    <div v-if="totalPages > 1" class="flex items-center justify-between mt-4">
+    <div v-if="totalPages > 1" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
       <p class="text-sm text-slate-400">
         Showing page <span class="font-mono">{{ currentPage }}</span> of <span class="font-mono">{{ totalPages }}</span> (<span class="font-mono">{{ total }}</span> total)
       </p>
-      <div class="flex items-center space-x-2">
+      <div class="flex items-center flex-wrap gap-2">
         <button
           @click="$emit('pageChange', currentPage - 1)"
           :disabled="currentPage <= 1"

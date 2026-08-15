@@ -73,7 +73,7 @@
           <!-- Defaults -->
           <div class="space-y-3">
             <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Defaults</h4>
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <label class="block">
                 <span class="text-[10px] text-slate-500 block mb-1">Quality</span>
                 <input
@@ -141,7 +141,7 @@
                     Skip if &lt; {{ forms[inst.id].roles[role].min_size_kb }} KB
                   </span>
                 </div>
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <label class="block">
                     <span class="text-[10px] text-slate-500 block mb-1">Quality</span>
                     <input
@@ -237,11 +237,11 @@
         </div>
 
         <!-- Card Footer -->
-        <div class="flex items-center justify-between p-4 border-t border-white/[0.06] mt-auto">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 border-t border-white/[0.06] mt-auto">
           <button
             type="button"
             @click="resetInstance(inst.id)"
-            class="bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 font-medium px-3 py-1.5 rounded transition-base text-xs"
+            class="w-full sm:w-auto justify-center bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 font-medium px-3 py-1.5 rounded transition-base text-xs"
           >
             Reset to Defaults
           </button>
@@ -249,7 +249,7 @@
             type="button"
             @click="saveInstance(inst.id)"
             :disabled="saving[inst.id]"
-            class="bg-accent hover:bg-accent-hover disabled:bg-accent/50 disabled:cursor-not-allowed text-base font-medium px-3 py-1.5 rounded transition-base text-xs inline-flex items-center"
+            class="w-full sm:w-auto justify-center bg-accent hover:bg-accent-hover disabled:bg-accent/50 disabled:cursor-not-allowed text-base font-medium px-3 py-1.5 rounded transition-base text-xs inline-flex items-center"
           >
             <svg v-if="saving[inst.id]" class="animate-spin h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />

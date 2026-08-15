@@ -2,7 +2,7 @@
   <div id="main-content">
     <!-- Instance Header -->
     <div v-if="instance" class="mb-4">
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-3">
         <div class="flex items-center space-x-3">
           <button
             @click="router.push('/instances')"
@@ -12,20 +12,20 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <div>
-            <h1 class="text-xl font-bold text-slate-100">{{ instance.name }}</h1>
-            <div class="flex items-center space-x-2 mt-1">
+          <div class="min-w-0">
+            <h1 class="text-xl font-bold text-slate-100 truncate">{{ instance.name }}</h1>
+            <div class="flex items-center flex-wrap gap-2 mt-1">
               <span
                 class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
                 :class="typeBadgeClass"
               >
                 {{ instance.type }}
               </span>
-              <span class="text-sm text-slate-500">{{ instance.host }}</span>
+              <span class="text-sm text-slate-500 truncate">{{ instance.host }}</span>
             </div>
           </div>
         </div>
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center flex-wrap gap-2">
           <button
             @click="openCleanupModal"
             class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-elevated text-slate-300 hover:bg-slate-700 hover:text-slate-100 transition-base border border-white/[0.06]"
@@ -67,7 +67,7 @@
       v-if="currentJob && (currentJob.status === 'pending' || currentJob.status === 'running')"
       class="bg-sky-900/20 border border-sky-700/30 rounded-lg px-3 py-2 mb-4"
     >
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div class="flex items-center space-x-3">
           <svg class="animate-spin h-5 w-5 text-sky-400" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -86,7 +86,7 @@
         </div>
         <button
           @click="cancelCurrentJob"
-          class="text-sm text-danger hover:text-red-400 underline"
+          class="text-sm text-danger hover:text-red-400 underline self-start sm:self-auto"
         >
           Cancel
         </button>
@@ -217,7 +217,7 @@
                       Skip if < {{ MIN_SIZES[role] }} KB
                     </span>
                   </div>
-                  <div class="grid grid-cols-2 gap-3">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label class="block text-xs text-slate-500 mb-1">Quality</label>
                       <input

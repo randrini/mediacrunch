@@ -105,14 +105,14 @@
         :key="entry.id"
         class="bg-white/[0.015] rounded p-2.5 hover:bg-white/[0.03] border border-white/[0.03] hover:border-white/[0.06] transition-base"
       >
-        <div class="flex items-start gap-2.5">
+        <div class="flex flex-col sm:flex-row sm:items-start gap-2.5">
           <!-- Timestamp -->
-          <div class="font-mono text-[11px] text-slate-600 whitespace-nowrap pt-0.5 min-w-[4rem]">
+          <div class="font-mono text-[11px] text-slate-600 whitespace-nowrap pt-0.5 sm:min-w-[4rem]">
             {{ formatTime(entry.created_at) }}
           </div>
 
           <!-- Badges -->
-          <div class="flex items-center gap-1 flex-shrink-0 pt-0.5">
+          <div class="flex items-center flex-wrap gap-1 flex-shrink-0 pt-0.5">
             <!-- Level badge -->
             <span
               class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium"
@@ -163,14 +163,14 @@
     <!-- Pagination -->
     <div
       v-if="total > 0"
-      class="flex items-center justify-between pt-2"
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-2"
     >
       <p class="text-[11px] text-slate-600 font-mono">
         Showing <span class="text-slate-400">{{ showingFrom }}</span>
         <span v-if="showingFrom !== showingTo">–<span class="text-slate-400">{{ showingTo }}</span></span>
         of <span class="text-slate-400">{{ total }}</span>
       </p>
-      <div class="flex items-center space-x-1.5">
+      <div class="flex items-center flex-wrap gap-1.5">
         <button
           @click="prevPage"
           :disabled="offset === 0"
