@@ -7,6 +7,13 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  # Deduplicate: same commit SHA cancels the earlier run.
+  # When pushing main + tag together, the tag push cancels the main push
+  # (or vice versa) so Docker builds only once.
+  group: ci-${{ github.sha }}
+  cancel-in-progress: true
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -28,7 +35,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: web/package-lock.json
 
@@ -85,7 +92,10 @@ jobs:
             type=semver,pattern={{version}}-${{ matrix.suffix }}
             type=semver,pattern={{major}}.{{minor}}-${{ matrix.suffix }}
             type=sha,prefix=sha-${{ matrix.suffix }}-
-            type=raw,value=${{ github.ref_name == 'main' && 'main' || '' }}-${{ matrix.suffix }}
+            type=raw,value=main-${{ matrix.suffix }},enable=${{ github.ref == 'refs/heads/main' }}
+            # On tag pushes, also produce the main-arch tag so the manifest
+            # step can tag :main even when the branch push was cancelled.
+            type=raw,value=main-${{ matrix.suffix }},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -158,11 +168,15 @@ jobs:
           flavor: |
             latest=${{ startsWith(github.ref, 'refs/tags/v') }}
           tags: |
+            # Branch pushes get :main
             type=ref,event=branch
+            # Tag pushes get version tags
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=sha
+            # Tag pushes also get :main so the branch push is redundant
+            type=raw,value=main,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
 
       - name: Create manifest list and push
         run: |
@@ -230,6 +244,6 @@ jobs:
             ```
 
             ## Multi-architecture
-            This image supports both `linux/amd64` and `linux/arm64`, built on native runners.
+            This image supports both `linux/amd64` `linux/arm64`, built on native runners.
           draft: false
           prerelease: ${{ contains(github.ref_name, 'rc') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
