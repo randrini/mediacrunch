@@ -2,18 +2,31 @@
   <div>
     <!-- Selection Bar -->
     <div
-      v-if="selectedCount > 0"
+      v-if="someSelected"
       class="bg-accent/10 border border-accent/30 rounded-lg px-4 py-2 mb-4 flex items-center justify-between"
     >
       <span class="text-sm text-slate-200">
-        <span class="font-semibold">{{ selectedCount }}</span> item{{ selectedCount !== 1 ? 's' : '' }} selected
+        <template v-if="selectAllMode">
+          All <span class="font-semibold">{{ totalItems }}</span> items selected
+        </template>
+        <template v-else>
+          <span class="font-semibold">{{ selectedCount }}</span> item{{ selectedCount !== 1 ? 's' : '' }} selected
+        </template>
       </span>
       <div class="flex items-center space-x-3">
         <button
-          @click="$emit('deselectAll')"
+          v-if="!selectAllMode && selectedCount < totalItems"
+          @click="$emit('selectAllAcrossPages')"
+          class="text-sm text-accent hover:text-accent-hover transition-base"
+        >
+          Select all {{ totalItems }} items
+        </button>
+        <button
+          v-else
+          @click="$emit('clearSelection')"
           class="text-sm text-slate-400 hover:text-slate-200 transition-base"
         >
-          Deselect all
+          Clear selection
         </button>
         <button
           @click="$emit('compress', selectedIds)"
@@ -288,9 +301,11 @@ const props = defineProps<{
   instanceType: string
   selectedIds: string[]
   lastSelectedId: string | null
+  selectAllMode: boolean
   currentPage: number
   totalPages: number
   total: number
+  totalItems: number
   sortField: string
   sortOrder: string
 }>()
@@ -298,6 +313,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   compress: [ids: string[]]
   selectAll: []
+  selectAllAcrossPages: []
+  clearSelection: []
   deselectAll: []
   toggleSelect: [id: string]
   selectRange: [fromId: string, toId: string]
@@ -306,8 +323,10 @@ const emit = defineEmits<{
 }>()
 
 const selectedCount = computed(() => props.selectedIds.length)
-const allSelected = computed(() => props.items.length > 0 && props.selectedIds.length === props.items.length)
-const someSelected = computed(() => props.selectedIds.length > 0)
+const allSelected = computed(() =>
+  props.selectAllMode || (props.items.length > 0 && props.selectedIds.length === props.items.length)
+)
+const someSelected = computed(() => props.selectAllMode || props.selectedIds.length > 0)
 
 const visiblePages = computed(() => {
   const pages: number[] = []
@@ -324,8 +343,10 @@ const visiblePages = computed(() => {
 })
 
 function onSelectAll() {
-  if (allSelected.value) {
-    emit('deselectAll')
+  if (props.selectAllMode) {
+    emit('clearSelection')
+  } else if (allSelected.value) {
+    emit('selectAllAcrossPages')
   } else {
     emit('selectAll')
   }

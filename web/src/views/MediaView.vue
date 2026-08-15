@@ -98,13 +98,17 @@
       :instance-type="instance?.type || ''"
       :selected-ids="[...mediaStore.selectedIds]"
       :last-selected-id="mediaStore.lastSelectedId"
+      :select-all-mode="mediaStore.selectAllMode"
       :current-page="mediaStore.page"
       :total-pages="mediaStore.totalPages"
       :total="mediaStore.total"
+      :total-items="mediaStore.total"
       :sort-field="mediaStore.filters.sort || 'total_size'"
       :sort-order="mediaStore.filters.order || 'desc'"
       @compress="handleCompress"
       @select-all="mediaStore.selectAll()"
+      @select-all-across-pages="mediaStore.selectAllAcrossPages()"
+      @clear-selection="mediaStore.clearSelection()"
       @deselect-all="mediaStore.deselectAll()"
       @toggle-select="mediaStore.toggleSelect"
       @select-range="(fromId: string, toId: string) => mediaStore.selectRange(fromId, toId)"
@@ -429,7 +433,7 @@ function handleSort(field: string, order: 'asc' | 'desc') {
 }
 
 async function handleCompress(ids: string[]) {
-  compressTargetIds.value = ids
+  compressTargetIds.value = mediaStore.selectAllMode ? null : ids
   // Refresh settings before showing modal so defaults are current
   await loadSettings()
   showCompressModal.value = true
@@ -476,8 +480,9 @@ watch(showCompressModal, (val) => {
 
 async function startCompression() {
   const config = { ...compressConfig.value }
+  const ids = compressTargetIds.value // null means "all items"
   try {
-    await compressState.startCompression(instanceId.value, compressTargetIds.value, config)
+    await compressState.startCompression(instanceId.value, ids, config)
     showCompressModal.value = false
     showRoleOverrides.value = false
   } catch {

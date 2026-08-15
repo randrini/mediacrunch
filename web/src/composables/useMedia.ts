@@ -13,6 +13,7 @@ export const useMediaStore = defineStore('media', () => {
   const error = ref<string | null>(null)
   const selectedIds = ref<Set<string>>(new Set())
   const lastSelectedId = ref<string | null>(null)
+  const selectAllMode = ref(false)
 
   let fetchId = 0
 
@@ -52,7 +53,10 @@ export const useMediaStore = defineStore('media', () => {
       page.value = result.page
       perPage.value = result.per_page
       totalPages.value = result.total_pages
-      if (!preserveSelection) selectedIds.value = new Set()
+      if (!preserveSelection) {
+        selectedIds.value = new Set()
+        selectAllMode.value = false
+      }
     } catch (e: any) {
       if (currentFetchId !== fetchId) return // stale error, discard
       error.value = e?.response?.data?.error || e?.message || 'Failed to fetch media items'
@@ -108,6 +112,16 @@ export const useMediaStore = defineStore('media', () => {
     items.value.forEach((i) => selectedIds.value.add(i.id))
   }
 
+  function selectAllAcrossPages() {
+    selectAllMode.value = true
+    selectedIds.value = new Set()
+  }
+
+  function clearSelection() {
+    selectAllMode.value = false
+    selectedIds.value = new Set()
+  }
+
   function deselectAll() {
     selectedIds.value = new Set()
   }
@@ -122,6 +136,7 @@ export const useMediaStore = defineStore('media', () => {
     error,
     selectedIds,
     lastSelectedId,
+    selectAllMode,
     filters,
     selectedItems,
     fetchItems,
@@ -131,6 +146,8 @@ export const useMediaStore = defineStore('media', () => {
     toggleSelect,
     selectRange,
     selectAll,
+    selectAllAcrossPages,
+    clearSelection,
     deselectAll,
   }
 })
