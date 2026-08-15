@@ -27,6 +27,16 @@
         </div>
         <div class="flex items-center space-x-2">
           <button
+            @click="openCleanupModal"
+            class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-elevated text-slate-300 hover:bg-slate-700 hover:text-slate-100 transition-base border border-white/[0.06]"
+            title="Clean up .bak files"
+          >
+            <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Clean up backups
+          </button>
+          <button
             @click="handleScan"
             class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-accent text-white hover:bg-accent-hover transition-base"
           >
@@ -278,6 +288,122 @@
         </div>
       </div>
     </teleport>
+
+    <!-- Clean Up Backups Modal -->
+    <teleport to="body">
+      <div
+        v-if="showCleanupModal"
+        class="fixed inset-0 z-50 flex items-center justify-center"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Clean up backup files"
+      >
+        <div class="absolute inset-0 bg-base/80 backdrop-blur-md" @click="showCleanupModal = false" />
+        <div class="relative card-glass w-full max-w-md mx-4 p-5">
+          <h3 class="text-lg font-semibold text-slate-100 mb-4">Clean Up Backup Files</h3>
+
+          <!-- Idle state -->
+          <div v-if="cleanupState === 'idle'" class="space-y-4">
+            <p class="text-sm text-slate-300">This will scan and delete .bak files from your metadata directories. These are backup files created by Plex and previous versions of MediaCrunch.</p>
+            <p class="text-xs text-slate-500">This action cannot be undone.</p>
+            <div class="flex justify-end space-x-3">
+              <button
+                @click="showCleanupModal = false"
+                class="px-3 py-1.5 text-sm font-medium text-slate-300 bg-elevated rounded-md hover:bg-slate-700 transition-base"
+              >
+                Cancel
+              </button>
+              <button
+                @click="previewCleanup"
+                class="px-3 py-1.5 text-sm font-medium text-white bg-accent rounded-md hover:bg-accent-hover transition-base"
+              >
+                Preview
+              </button>
+            </div>
+          </div>
+
+          <!-- Previewing state (spinner) -->
+          <div v-else-if="cleanupState === 'previewing'" class="text-center py-6">
+            <svg class="animate-spin h-8 w-8 text-accent mx-auto" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            <p class="text-sm text-slate-300 mt-3">Scanning for backup files...</p>
+          </div>
+
+          <!-- Preview results state -->
+          <div v-else-if="cleanupState === 'preview'" class="space-y-4">
+            <div class="bg-elevated rounded-lg p-4 text-center">
+              <p class="text-2xl font-bold text-slate-100">{{ cleanupResult.deleted_files }}</p>
+              <p class="text-xs text-slate-400">.bak files found</p>
+              <p class="text-lg font-semibold text-accent mt-1">{{ formatBytes(cleanupResult.freed_bytes) }}</p>
+              <p class="text-xs text-slate-400">disk space to free</p>
+            </div>
+            <div v-if="cleanupResult.errors.length > 0" class="bg-danger/10 border border-danger/20 rounded p-3">
+              <p class="text-xs text-danger">{{ cleanupResult.errors.length }} files could not be accessed</p>
+            </div>
+            <div v-if="cleanupResult.deleted_files === 0" class="text-center">
+              <p class="text-sm text-slate-400">No backup files found.</p>
+            </div>
+            <div class="flex justify-end space-x-3">
+              <button
+                @click="showCleanupModal = false"
+                class="px-3 py-1.5 text-sm font-medium text-slate-300 bg-elevated rounded-md hover:bg-slate-700 transition-base"
+              >
+                Cancel
+              </button>
+              <button
+                v-if="cleanupResult.deleted_files > 0"
+                @click="executeCleanup"
+                class="px-3 py-1.5 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-base"
+              >
+                Delete All
+              </button>
+            </div>
+          </div>
+
+          <!-- Deleting state (spinner) -->
+          <div v-else-if="cleanupState === 'deleting'" class="text-center py-6">
+            <svg class="animate-spin h-8 w-8 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            <p class="text-sm text-slate-300 mt-3">Deleting backup files...</p>
+          </div>
+
+          <!-- Done state -->
+          <div v-else-if="cleanupState === 'done'" class="space-y-4">
+            <div class="bg-accent/10 border border-accent/20 rounded-lg p-4 text-center">
+              <p class="text-2xl font-bold text-slate-100">{{ cleanupResult.deleted_files }}</p>
+              <p class="text-xs text-slate-400">files deleted</p>
+              <p class="text-lg font-semibold text-accent mt-1">{{ formatBytes(cleanupResult.freed_bytes) }}</p>
+              <p class="text-xs text-slate-400">disk space freed</p>
+            </div>
+            <div class="flex justify-end">
+              <button
+                @click="showCleanupModal = false"
+                class="px-3 py-1.5 text-sm font-medium text-slate-300 bg-elevated rounded-md hover:bg-slate-700 transition-base"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+
+          <!-- Error state -->
+          <div v-else-if="cleanupState === 'error'" class="space-y-4">
+            <p class="text-sm text-danger">{{ cleanupError }}</p>
+            <div class="flex justify-end">
+              <button
+                @click="showCleanupModal = false"
+                class="px-3 py-1.5 text-sm font-medium text-slate-300 bg-elevated rounded-md hover:bg-slate-700 transition-base"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </teleport>
   </div>
 </template>
 
@@ -287,8 +413,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useInstancesStore } from '../composables/useInstances'
 import { useMediaStore } from '../composables/useMedia'
 import { useCompressStore } from '../composables/useCompress'
-import { getInstance, getInstanceStats, getInstanceSettings } from '../api'
-import type { Instance, Stats, InstanceSettings } from '../types'
+import { getInstance, getInstanceStats, getInstanceSettings, cleanupBackups } from '../api'
+import type { Instance, Stats, InstanceSettings, CleanupResult } from '../types'
 import { ROLE_DEFAULTS, MIN_SIZES, ROLE_LABELS, ROLE_ORDER } from '../constants/defaults'
 import MediaTable from '../components/MediaTable.vue'
 import SearchFilter from '../components/SearchFilter.vue'
@@ -309,6 +435,11 @@ const showCompressModal = ref(false)
 const showRoleOverrides = ref(false)
 const compressTargetIds = ref<string[] | null>(null)
 const instanceSettings = ref<InstanceSettings | null>(null)
+
+const showCleanupModal = ref(false)
+const cleanupState = ref<'idle' | 'previewing' | 'preview' | 'deleting' | 'done' | 'error'>('idle')
+const cleanupResult = ref<CleanupResult>({ instance_id: '', instance_name: '', instance_type: '', dry_run: false, deleted_files: 0, freed_bytes: 0, errors: [] })
+const cleanupError = ref('')
 
 const compressConfig = ref<{
   quality: Record<string, number>
@@ -504,6 +635,38 @@ function handleScan() {
   }).catch((e: any) => {
     console.error('Failed to scan:', e?.message || e)
   })
+}
+
+function openCleanupModal() {
+  cleanupState.value = 'idle'
+  cleanupError.value = ''
+  cleanupResult.value = { instance_id: '', instance_name: '', instance_type: '', dry_run: false, deleted_files: 0, freed_bytes: 0, errors: [] }
+  showCleanupModal.value = true
+}
+
+async function previewCleanup() {
+  cleanupState.value = 'previewing'
+  try {
+    cleanupResult.value = await cleanupBackups(instanceId.value, true)
+    cleanupState.value = 'preview'
+  } catch (e: any) {
+    cleanupError.value = e?.response?.data?.error || e?.message || 'Failed to scan for backup files'
+    cleanupState.value = 'error'
+  }
+}
+
+async function executeCleanup() {
+  cleanupState.value = 'deleting'
+  try {
+    cleanupResult.value = await cleanupBackups(instanceId.value, false)
+    cleanupState.value = 'done'
+    // Refresh media data since .bak files may have been in the scanned list
+    mediaStore.fetchItems(instanceId.value)
+    loadStats()
+  } catch (e: any) {
+    cleanupError.value = e?.response?.data?.error || e?.message || 'Failed to delete backup files'
+    cleanupState.value = 'error'
+  }
 }
 
 function formatBytes(bytes: number): string {

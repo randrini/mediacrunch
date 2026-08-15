@@ -9,6 +9,8 @@ import type {
   PaginatedResponse,
   TestConnectionResponse,
   LogEntry,
+  CleanupResult,
+  CleanupAllResult,
 } from '../types'
 
 const api = axios.create({
@@ -177,4 +179,13 @@ export function getLogs(params?: LogQueryParams): Promise<LogsResponse> {
 
 export function clearLogs(): Promise<{ message: string; deleted: number }> {
   return api.delete('/logs').then(r => r.data)
+}
+
+// --- Backup Cleanup ---
+export function cleanupBackups(instanceId: string, dryRun: boolean = false): Promise<CleanupResult> {
+  return api.post(`/instances/${instanceId}/cleanup-backups`, { dry_run: dryRun }).then(r => r.data)
+}
+
+export function cleanupAllBackups(dryRun: boolean = false): Promise<CleanupAllResult> {
+  return api.post('/cleanup-backups', { dry_run: dryRun }).then(r => r.data)
 }

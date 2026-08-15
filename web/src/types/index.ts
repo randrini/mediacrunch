@@ -126,3 +126,20 @@ export interface LogEntry {
   details: string;
   created_at: string;
 }
+
+export interface CleanupResult {
+  instance_id: string;
+  instance_name: string;
+  instance_type: string;
+  dry_run: boolean;
+  deleted_files: number;
+  freed_bytes: number;
+  errors: string[];
+}
+
+export interface CleanupAllResult {
+  dry_run: boolean;
+  results: CleanupResult[];
+  total_deleted: number;
+  total_freed_bytes: number;
+}
