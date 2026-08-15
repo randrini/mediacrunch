@@ -64,6 +64,7 @@ func NewRouter(database *db.DB) *gin.Engine {
 	mediaHandler := NewMediaHandler(database, cacheStore)
 	compressHandler := NewCompressHandler(database, comp, cacheStore, log)
 	statsHandler := NewStatsHandler(database, cacheStore)
+	cleanupHandler := NewCleanupHandler(database, cacheStore, log)
 
 	// API routes
 	{
@@ -106,6 +107,10 @@ func NewRouter(database *db.DB) *gin.Engine {
 		logHandler := NewLogHandler(database)
 		api.GET("/logs", logHandler.GetLogs)
 		api.DELETE("/logs", logHandler.ClearLogs)
+
+		// Cleanup
+		api.POST("/instances/:id/cleanup-backups", cleanupHandler.CleanupInstance)
+		api.POST("/cleanup-backups", cleanupHandler.CleanupAll)
 	}
 
 	// Serve Vue SPA static files
