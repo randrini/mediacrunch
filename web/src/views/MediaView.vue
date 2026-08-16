@@ -184,29 +184,48 @@
 
             <!-- Section 2: Role Overrides -->
             <div>
-              <button
-                type="button"
-                @click="showRoleOverrides = !showRoleOverrides"
-                class="group flex items-center text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-accent transition-base mb-3"
-              >
-                <svg
-                  class="w-3.5 h-3.5 mr-1.5 transition-transform duration-200"
-                  :class="{ 'rotate-90': showRoleOverrides }"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2.5"
+              <div class="flex items-center justify-between mb-3">
+                <button
+                  type="button"
+                  @click="showRoleOverrides = !showRoleOverrides"
+                  class="group flex items-center text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-accent transition-base"
                 >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-                Role-specific settings
-              </button>
+                  <svg
+                    class="w-3.5 h-3.5 mr-1.5 transition-transform duration-200"
+                    :class="{ 'rotate-90': showRoleOverrides }"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                  Role-specific settings
+                </button>
+                <!-- Lock/Unlock sync toggle -->
+                <button
+                  type="button"
+                  @click="roleSyncLocked = !roleSyncLocked"
+                  class="inline-flex items-center space-x-1.5 text-xs font-medium transition-base"
+                  :class="roleSyncLocked ? 'text-accent' : 'text-slate-500 hover:text-slate-300'"
+                  :title="roleSyncLocked ? 'Locked: all roles sync to default values. Click to unlock per-role customization.' : 'Unlocked: per-role values are independent. Click to sync all roles to defaults.'"
+                >
+                  <svg v-if="roleSyncLocked" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <svg v-else class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                  </svg>
+                  <span>{{ roleSyncLocked ? 'Synced' : 'Custom' }}</span>
+                </button>
+              </div>
 
               <div v-show="showRoleOverrides" class="space-y-3">
                 <div
                   v-for="role in ROLE_ORDER"
                   :key="role"
                   class="bg-elevated/60 border border-white/[0.06] rounded-lg p-3"
+                  :class="{ 'opacity-60': roleSyncLocked }"
                 >
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-sm font-medium text-slate-200">{{ ROLE_LABELS[role] }}</span>
@@ -225,7 +244,8 @@
                         type="number"
                         min="1"
                         max="100"
-                        class="w-full bg-base border border-white/[0.08] rounded-md px-2.5 py-1.5 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
+                        :disabled="roleSyncLocked"
+                        class="w-full bg-base border border-white/[0.08] rounded-md px-2.5 py-1.5 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                     <div>
@@ -235,7 +255,8 @@
                         type="number"
                         min="100"
                         step="100"
-                        class="w-full bg-base border border-white/[0.08] rounded-md px-2.5 py-1.5 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
+                        :disabled="roleSyncLocked"
+                        class="w-full bg-base border border-white/[0.08] rounded-md px-2.5 py-1.5 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -474,33 +495,41 @@ const compressConfig = ref<{
   recompress: false,
 })
 
-// Track previous default values so we can sync role overrides when defaults change
-const prevQualityDefault = ref(ROLE_DEFAULTS.quality.default)
-const prevMaxWidthDefault = ref(ROLE_DEFAULTS.max_width.default)
+// When roleSyncLocked is true (default), changing default quality/width syncs ALL roles.
+// When unlocked, per-role values are independent and don't sync.
+const roleSyncLocked = ref(true)
 const settingsLoaded = ref(false)
 
-// When the default quality changes, update any role override that matched the old default
+// When the default quality changes, sync all role overrides to the new value (if locked)
 watch(() => compressConfig.value.quality.default, (newVal, oldVal) => {
   if (!settingsLoaded.value) return
   if (oldVal === undefined) return
+  if (!roleSyncLocked.value) return
   for (const role of ROLE_ORDER) {
-    if (compressConfig.value.quality[role] === oldVal) {
-      compressConfig.value.quality[role] = newVal
-    }
+    compressConfig.value.quality[role] = newVal
   }
-  prevQualityDefault.value = newVal
 })
 
-// When the default max_width changes, update any role override that matched the old default
+// When the default max_width changes, sync all role overrides to the new value (if locked)
 watch(() => compressConfig.value.max_width.default, (newVal, oldVal) => {
   if (!settingsLoaded.value) return
   if (oldVal === undefined) return
+  if (!roleSyncLocked.value) return
   for (const role of ROLE_ORDER) {
-    if (compressConfig.value.max_width[role] === oldVal) {
-      compressConfig.value.max_width[role] = newVal
+    compressConfig.value.max_width[role] = newVal
+  }
+})
+
+// When unlocking, reset per-role values to their instance-specific defaults (or global defaults)
+// so users start from a known baseline when they begin customizing
+watch(roleSyncLocked, (locked) => {
+  if (locked) {
+    // Re-sync all roles to current defaults
+    for (const role of ROLE_ORDER) {
+      compressConfig.value.quality[role] = compressConfig.value.quality.default
+      compressConfig.value.max_width[role] = compressConfig.value.max_width.default
     }
   }
-  prevMaxWidthDefault.value = newVal
 })
 
 const progressPercent = computed(() => {
@@ -582,8 +611,9 @@ function handleSort(field: string, order: 'asc' | 'desc') {
 
 async function handleCompress(ids: string[]) {
   compressTargetIds.value = mediaStore.selectAllMode ? null : ids
-  // Reset recompress to false when opening modal
+  // Reset recompress and role sync to defaults when opening modal
   compressConfig.value.recompress = false
+  roleSyncLocked.value = true
   // Refresh settings before showing modal so defaults are current
   await loadSettings()
   showCompressModal.value = true
