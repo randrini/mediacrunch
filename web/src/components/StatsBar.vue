@@ -15,7 +15,7 @@
       </div>
 
       <!-- Divider -->
-      <div class="hidden md:block w-px h-8 bg-white/[0.06]" />
+      <div class="hidden md:block w-px h-6 bg-white/[0.06]" />
 
       <!-- Total Size -->
       <div class="flex items-center space-x-2.5">
@@ -31,7 +31,7 @@
       </div>
 
       <!-- Divider -->
-      <div class="hidden md:block w-px h-8 bg-white/[0.06]" />
+      <div class="hidden md:block w-px h-6 bg-white/[0.06]" />
 
       <!-- Total Saved -->
       <div class="flex items-center space-x-2.5">
@@ -47,7 +47,7 @@
       </div>
 
       <!-- Divider -->
-      <div class="hidden md:block w-px h-8 bg-white/[0.06]" />
+      <div class="hidden md:block w-px h-6 bg-white/[0.06]" />
 
       <!-- Savings Percentage -->
       <div class="flex items-center space-x-2.5">

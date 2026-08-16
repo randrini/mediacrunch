@@ -46,7 +46,7 @@
         <table class="min-w-full divide-y divide-white/[0.06]">
           <thead class="bg-elevated">
             <tr>
-              <th class="px-3 py-2 text-left">
+              <th class="px-2 py-1.5 text-left">
                 <input
                   type="checkbox"
                   :checked="allSelected"
@@ -55,9 +55,9 @@
                   class="rounded border-white/[0.08] bg-elevated text-accent focus:ring-accent/50"
                 />
               </th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
+              <th class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider">Type</th>
               <th
-                class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-200"
+                class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-200"
                 @click="sortBy('title')"
               >
                 <span class="inline-flex items-center">
@@ -70,15 +70,15 @@
                   </svg>
                 </span>
               </th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Year</th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Images</th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Fanart</th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Poster</th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Clear Logo</th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Season Poster</th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Banner</th>
+              <th class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider">Year</th>
+              <th class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider">Images</th>
+              <th class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider">Fanart</th>
+              <th class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider">Poster</th>
+              <th class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider">Clear Logo</th>
+              <th class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider">Season Poster</th>
+              <th class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider">Banner</th>
               <th
-                class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-200"
+                class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-200"
                 @click="sortBy('original_size')"
               >
                 <span class="inline-flex items-center">
@@ -95,7 +95,7 @@
                 </span>
               </th>
               <th
-                class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-200"
+                class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-200"
                 @click="sortBy('total_size')"
               >
                 <span class="inline-flex items-center">
@@ -111,16 +111,16 @@
                   </svg>
                 </span>
               </th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Saved</th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Compressed</th>
-              <th v-if="instanceType === 'plex'" class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Locked</th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+              <th class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider">Saved</th>
+              <th class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider">Compressed</th>
+              <th v-if="instanceType === 'plex'" class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider">Locked</th>
+              <th class="px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-white/[0.06]">
             <!-- Loading skeleton -->
             <tr v-if="loading">
-              <td v-for="i in (instanceType === 'plex' ? 16 : 15)" :key="i" class="px-3 py-2">
+              <td v-for="i in (instanceType === 'plex' ? 16 : 15)" :key="i" class="px-2 py-1">
                 <div class="h-4 bg-elevated rounded animate-pulse" :style="{ width: i === 3 ? '60%' : i === 5 ? '40%' : '80%' }" />
               </td>
             </tr>
@@ -141,7 +141,7 @@
               class="hover:bg-elevated/30 transition-base"
               :class="{ 'bg-accent/5': selectedIds.includes(item.id) }"
             >
-              <td class="px-3 py-2">
+              <td class="px-2 py-1">
                 <input
                   type="checkbox"
                   :checked="selectedIds.includes(item.id)"
@@ -149,25 +149,25 @@
                   class="rounded border-white/[0.08] bg-elevated text-accent focus:ring-accent/50"
                 />
               </td>
-              <td class="px-3 py-2 whitespace-nowrap">
+              <td class="px-2 py-1 whitespace-nowrap">
                 <span class="text-lg" :title="item.media_type">{{ typeIcon(item.media_type) }}</span>
               </td>
-              <td class="px-3 py-2">
-                <div class="text-sm font-medium text-slate-100 truncate max-w-xs" :title="item.title">
+              <td class="px-2 py-1">
+                <div class="text-xs font-medium text-slate-100 truncate max-w-xs" :title="item.title">
                   {{ item.title }}
                 </div>
               </td>
-              <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-400 font-mono">
+              <td class="px-2 py-1 whitespace-nowrap text-xs text-slate-400 font-mono">
                 {{ item.year ?? '-' }}
               </td>
-              <td class="px-3 py-2 whitespace-nowrap">
+              <td class="px-2 py-1 whitespace-nowrap">
                 <div class="relative group">
-                  <span class="text-sm text-slate-300 cursor-help font-mono">{{ item.total_images }}</span>
+                  <span class="text-xs text-slate-300 cursor-help font-mono">{{ item.total_images }}</span>
                   <div
                     v-if="item.images && item.images.length > 0"
                     class="absolute bottom-full left-0 mb-2 hidden group-hover:block z-10"
                   >
-                    <div class="bg-slate-700 border border-white/[0.08] rounded-md shadow-lg px-3 py-2 text-xs text-slate-200 whitespace-nowrap">
+                    <div class="bg-slate-700 border border-white/[0.08] rounded-md shadow-lg px-2 py-1 text-xs text-slate-200 whitespace-nowrap">
                       <div v-for="img in item.images" :key="img.role" class="py-0.5">
                         <span class="font-medium">{{ img.role }}:</span>
                         {{ formatBytes(img.size_bytes) }} ({{ img.width }}x{{ img.height }})
@@ -176,57 +176,57 @@
                   </div>
                 </div>
               </td>
-              <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-300 font-mono">
+              <td class="px-2 py-1 whitespace-nowrap text-xs text-slate-300 font-mono">
                 <span v-if="item.fanart_size">{{ formatBytes(item.fanart_size) }}</span>
                 <span v-else class="text-slate-500">—</span>
               </td>
-              <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-300 font-mono">
+              <td class="px-2 py-1 whitespace-nowrap text-xs text-slate-300 font-mono">
                 <span v-if="item.poster_size">{{ formatBytes(item.poster_size) }}</span>
                 <span v-else class="text-slate-500">—</span>
               </td>
-              <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-300 font-mono">
+              <td class="px-2 py-1 whitespace-nowrap text-xs text-slate-300 font-mono">
                 <span v-if="item.clear_logo_size">{{ formatBytes(item.clear_logo_size) }}</span>
                 <span v-else class="text-slate-500">—</span>
               </td>
-              <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-300 font-mono">
+              <td class="px-2 py-1 whitespace-nowrap text-xs text-slate-300 font-mono">
                 <span v-if="item.season_poster_size">{{ formatBytes(item.season_poster_size) }}</span>
                 <span v-else class="text-slate-500">—</span>
               </td>
-              <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-300 font-mono">
+              <td class="px-2 py-1 whitespace-nowrap text-xs text-slate-300 font-mono">
                 <span v-if="item.banner_size">{{ formatBytes(item.banner_size) }}</span>
                 <span v-else class="text-slate-500">—</span>
               </td>
-              <td class="px-3 py-2 whitespace-nowrap">
+              <td class="px-2 py-1 whitespace-nowrap">
                 <span :class="sizeBadgeClass(item.compressed && item.original_size > 0 ? item.original_size : item.total_size)" class="font-mono">
                   {{ formatBytes(item.compressed && item.original_size > 0 ? item.original_size : item.total_size) }}
                 </span>
               </td>
-              <td class="px-3 py-2 whitespace-nowrap">
+              <td class="px-2 py-1 whitespace-nowrap">
                 <span v-if="item.compressed && item.original_size > 0" class="size-badge-small font-mono">
                   {{ formatBytes(item.total_size) }}
                 </span>
-                <span v-else class="text-slate-500 text-sm">—</span>
+                <span v-else class="text-slate-500 text-xs">—</span>
               </td>
-              <td class="px-3 py-2 whitespace-nowrap">
-                <span v-if="item.compressed && item.original_size > 0" class="text-sm font-medium text-accent font-mono">
+              <td class="px-2 py-1 whitespace-nowrap">
+                <span v-if="item.compressed && item.original_size > 0" class="text-xs font-medium text-accent font-mono">
                   −{{ formatBytes(item.original_size - item.total_size) }}
-                  <span class="text-xs text-slate-500">({{ Math.round((1 - item.total_size / item.original_size) * 100) }}%)</span>
+                  <span class="text-[11px] text-slate-500">({{ Math.round((1 - item.total_size / item.original_size) * 100) }}%)</span>
                 </span>
-                <span v-else class="text-slate-500 text-sm">—</span>
+                <span v-else class="text-slate-500 text-xs">—</span>
               </td>
-              <td class="px-3 py-2 whitespace-nowrap">
+              <td class="px-2 py-1 whitespace-nowrap">
                 <span
                   v-if="item.compressed"
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent/10 text-accent"
+                  class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-accent/10 text-accent"
                 >
                   <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                   Compressed
                 </span>
-                <span v-else class="text-slate-500 text-sm">—</span>
+                <span v-else class="text-slate-500 text-xs">—</span>
               </td>
-              <td v-if="instanceType === 'plex'" class="px-3 py-2 whitespace-nowrap">
+              <td v-if="instanceType === 'plex'" class="px-2 py-1 whitespace-nowrap">
                 <svg
                   v-if="item.locked"
                   class="w-4 h-4 text-warning"
@@ -235,13 +235,13 @@
                 >
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
-                <span v-else class="text-slate-500 text-sm">—</span>
+                <span v-else class="text-slate-500 text-xs">—</span>
               </td>
-              <td class="px-3 py-2 whitespace-nowrap">
+              <td class="px-2 py-1 whitespace-nowrap">
                 <button
                   @click="$emit('compress', [item.id])"
                   :disabled="item.compressed"
-                  class="inline-flex items-center px-2 py-1 text-xs font-medium rounded transition-base"
+                  class="inline-flex items-center px-1.5 py-0.5 text-[11px] font-medium rounded transition-base"
                   :class="item.compressed ? 'bg-elevated text-slate-500 cursor-not-allowed' : 'bg-accent-dim text-accent hover:bg-accent/20'"
                 >
                   <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -280,7 +280,7 @@
       <div
         v-for="item in items"
         :key="item.id"
-        class="card-glass p-3 relative"
+        class="card-glass p-2.5 relative"
         :class="{ 'bg-accent/5 border-accent/30': selectedIds.includes(item.id) }"
       >
         <!-- Selection toggle (top-right) -->
@@ -297,29 +297,29 @@
         <div class="flex items-start gap-2 pr-8">
           <span class="text-lg leading-none" :title="item.media_type">{{ typeIcon(item.media_type) }}</span>
           <div class="min-w-0">
-            <p class="text-sm font-semibold text-slate-100 truncate" :title="item.title">{{ item.title }}</p>
-            <p class="text-xs text-slate-500 font-mono mt-0.5">{{ item.year ?? '-' }}</p>
+            <p class="text-xs font-semibold text-slate-100 truncate" :title="item.title">{{ item.title }}</p>
+            <p class="text-[11px] text-slate-500 font-mono mt-0.5">{{ item.year ?? '-' }}</p>
           </div>
         </div>
 
         <!-- Key stats -->
         <div class="mt-3 grid grid-cols-3 gap-2 text-center">
-          <div class="bg-white/[0.03] rounded py-1.5 px-1">
-            <p class="text-sm font-semibold text-slate-100 font-mono tabular-nums">{{ item.total_images }}</p>
-            <p class="text-[10px] text-slate-500 uppercase tracking-wider">Images</p>
+          <div class="bg-white/[0.03] rounded py-1 px-1">
+            <p class="text-xs font-semibold text-slate-100 font-mono tabular-nums">{{ item.total_images }}</p>
+            <p class="text-[9px] text-slate-500 uppercase tracking-wider">Images</p>
           </div>
-          <div class="bg-white/[0.03] rounded py-1.5 px-1">
-            <p class="text-sm font-semibold text-slate-100 font-mono tabular-nums">
+          <div class="bg-white/[0.03] rounded py-1 px-1">
+            <p class="text-xs font-semibold text-slate-100 font-mono tabular-nums">
               {{ formatBytes(item.compressed && item.original_size > 0 ? item.original_size : item.total_size) }}
             </p>
-            <p class="text-[10px] text-slate-500 uppercase tracking-wider">Size</p>
+            <p class="text-[9px] text-slate-500 uppercase tracking-wider">Size</p>
           </div>
-          <div class="bg-white/[0.03] rounded py-1.5 px-1">
-            <p v-if="item.compressed && item.original_size > 0" class="text-sm font-semibold text-accent font-mono tabular-nums">
+          <div class="bg-white/[0.03] rounded py-1 px-1">
+            <p v-if="item.compressed && item.original_size > 0" class="text-xs font-semibold text-accent font-mono tabular-nums">
               −{{ formatBytes(item.original_size - item.total_size) }}
             </p>
-            <p v-else class="text-sm font-semibold text-slate-500 font-mono tabular-nums">—</p>
-            <p class="text-[10px] text-slate-500 uppercase tracking-wider">Saved</p>
+            <p v-else class="text-xs font-semibold text-slate-500 font-mono tabular-nums">—</p>
+            <p class="text-[9px] text-slate-500 uppercase tracking-wider">Saved</p>
           </div>
         </div>
 
@@ -327,7 +327,7 @@
         <div class="mt-3 flex items-center justify-between gap-2">
           <span
             v-if="item.compressed"
-            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent/10 text-accent"
+            class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-accent/10 text-accent"
           >
             <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -338,7 +338,7 @@
           <button
             @click="$emit('compress', [item.id])"
             :disabled="item.compressed"
-            class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded transition-base"
+            class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded transition-base"
             :class="item.compressed ? 'bg-elevated text-slate-500 cursor-not-allowed' : 'bg-accent-dim text-accent hover:bg-accent/20'"
           >
             <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

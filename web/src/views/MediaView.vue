@@ -13,7 +13,7 @@
             </svg>
           </button>
           <div class="min-w-0">
-            <h1 class="text-xl font-bold text-slate-100 truncate">{{ instance.name }}</h1>
+            <h1 class="text-lg font-bold text-slate-100 truncate">{{ instance.name }}</h1>
             <div class="flex items-center flex-wrap gap-2 mt-1">
               <span
                 class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
@@ -21,7 +21,7 @@
               >
                 {{ instance.type }}
               </span>
-              <span class="text-sm text-slate-500 truncate">{{ instance.host }}</span>
+              <span class="text-xs text-slate-500 truncate">{{ instance.host }}</span>
             </div>
           </div>
         </div>

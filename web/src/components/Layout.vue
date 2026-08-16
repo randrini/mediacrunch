@@ -6,7 +6,7 @@
     </a>
     <!-- Top Nav -->
     <nav class="sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-white/[0.06]">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-12">
           <!-- Left: Brand + Nav Links -->
           <div class="flex items-center space-x-6">
@@ -14,33 +14,33 @@
               <svg class="w-6 h-6 text-accent transition-base group-hover:scale-105" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span class="text-sm font-bold text-slate-100 tracking-tight font-mono">MediaCrunch</span>
+              <span class="text-xs font-bold text-slate-100 tracking-tight font-mono">MediaCrunch</span>
             </router-link>
             <div class="hidden md:flex space-x-1">
               <router-link
                 to="/"
-                class="px-2.5 py-1 rounded text-xs font-medium transition-base"
+                class="px-2 py-0.5 rounded text-[11px] font-medium transition-base"
                 :class="isActive('/') ? 'bg-accent/10 text-accent' : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04]'"
               >
                 Dashboard
               </router-link>
               <router-link
                 to="/instances"
-                class="px-2.5 py-1 rounded text-xs font-medium transition-base"
+                class="px-2 py-0.5 rounded text-[11px] font-medium transition-base"
                 :class="isActive('/instances') ? 'bg-accent/10 text-accent' : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04]'"
               >
                 Instances
               </router-link>
               <router-link
                 to="/settings"
-                class="px-2.5 py-1 rounded text-xs font-medium transition-base"
+                class="px-2 py-0.5 rounded text-[11px] font-medium transition-base"
                 :class="isActive('/settings') ? 'bg-accent/10 text-accent' : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04]'"
               >
                 Settings
               </router-link>
               <router-link
                 to="/logs"
-                class="px-2.5 py-1 rounded text-xs font-medium transition-base"
+                class="px-2 py-0.5 rounded text-[11px] font-medium transition-base"
                 :class="isActive('/logs') ? 'bg-accent/10 text-accent' : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04]'"
               >
                 Logs
@@ -152,14 +152,14 @@
 
     <!-- Main Content -->
     <main class="flex-1">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <slot />
       </div>
     </main>
 
     <!-- Footer -->
     <footer class="border-t border-white/[0.06] py-2">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <p class="text-center text-[11px] text-slate-500 font-mono">
           MediaCrunch {{ version || '...' }} &mdash; Media image compression for Radarr, Sonarr &amp; Plex
         </p>
