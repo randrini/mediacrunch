@@ -48,7 +48,7 @@
         <button
           v-if="!showClearConfirm"
           @click="showClearConfirm = true"
-          class="bg-danger/10 border border-danger/20 text-danger hover:bg-danger/20 px-2.5 py-1 rounded-sm text-[11px] font-medium transition-base"
+          class="bg-danger/10 border border-danger/30 text-danger hover:bg-danger/20 px-2.5 py-1 rounded-sm text-[11px] font-medium transition-base"
         >
           Clear Logs
         </button>
@@ -73,7 +73,7 @@
     <!-- Error banner -->
     <div
       v-if="error"
-      class="bg-danger/10 border border-danger/20 rounded-sm px-3 py-2 text-xs text-danger"
+      class="bg-danger/10 border border-danger/30 rounded-sm px-3 py-2 text-xs text-danger"
     >
       {{ error }}
     </div>
@@ -130,7 +130,7 @@
             <!-- Instance badge -->
             <span
               v-if="entry.instance_id && instanceMap.get(entry.instance_id)"
-              class="inline-flex items-center px-1.5 py-0.5 rounded-sm text-[10px] font-mono font-medium bg-accent-muted text-accent border border-accent/30"
+              class="inline-flex items-center px-1.5 py-0.5 rounded-sm text-[10px] font-mono font-medium bg-accent-muted text-accent border border-accent/40"
             >
               {{ instanceMap.get(entry.instance_id) }}
             </span>
@@ -298,7 +298,7 @@ function formatTime(ts: string): string {
 
 function levelClass(level: string): string {
   switch (level) {
-    case 'error': return 'bg-danger/10 text-danger border border-danger/20'
+    case 'error': return 'bg-danger/10 text-danger border border-danger/30'
     case 'warn': return 'bg-warning/10 text-warning border border-warning/20'
     case 'info': return 'bg-success/10 text-success border border-success/20'
     case 'debug': return 'bg-highlight text-text-tertiary border border-border'
@@ -308,7 +308,7 @@ function levelClass(level: string): string {
 
 function sourceClass(source: string): string {
   switch (source) {
-    case 'scanner': return 'bg-accent-muted text-accent border border-accent/30'
+    case 'scanner': return 'bg-accent-muted text-accent border border-accent/40'
     case 'compressor': return 'bg-success/10 text-success border border-success/20'
     case 'api': return 'bg-highlight text-text-secondary border border-border'
     case 'system': return 'bg-highlight text-text-tertiary border border-border'

@@ -3,7 +3,7 @@
     <!-- Selection Bar -->
     <div
       v-if="someSelected"
-      class="bg-accent-muted border border-accent/30 rounded-md px-4 py-2 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
+      class="bg-accent-muted border border-accent/40 rounded-md px-4 py-2 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
     >
       <span class="text-sm text-text-primary">
         <template v-if="selectAllMode">
@@ -281,7 +281,7 @@
         v-for="item in items"
         :key="item.id"
         class="card-glass p-2.5 relative"
-        :class="{ 'bg-accent-muted border-accent/30': selectedIds.includes(item.id) }"
+        :class="{ 'bg-accent-muted border-accent/40': selectedIds.includes(item.id) }"
       >
         <!-- Selection toggle (top-right) -->
         <label class="absolute top-2.5 right-2.5 z-10 cursor-pointer" @click.stop>

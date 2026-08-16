@@ -227,7 +227,7 @@
           <div
             v-if="toasts[inst.id]"
             class="rounded-sm p-2.5 text-xs"
-            :class="toasts[inst.id]!.type === 'success' ? 'bg-accent-muted border border-accent/20 text-accent' : 'bg-danger/10 border border-danger/20 text-danger'"
+            :class="toasts[inst.id]!.type === 'success' ? 'bg-accent-muted border border-accent/20 text-accent' : 'bg-danger/10 border border-danger/30 text-danger'"
           >
             <div class="flex items-center justify-between">
               <p>{{ toasts[inst.id]!.message }}</p>
@@ -340,18 +340,18 @@ function typeIconText(type: string): string {
 
 function typeIconClass(type: string): string {
   switch (type) {
-    case 'radarr': return 'bg-accent-muted text-accent border-accent/30'
-    case 'sonarr': return 'bg-accent-muted text-accent border-accent/30'
-    case 'plex': return 'bg-accent-muted text-accent border-accent/30'
+    case 'radarr': return 'bg-accent-muted text-accent border-accent/40'
+    case 'sonarr': return 'bg-accent-muted text-accent border-accent/40'
+    case 'plex': return 'bg-accent-muted text-accent border-accent/40'
     default: return 'bg-highlight text-text-secondary border-border'
   }
 }
 
 function typeBadgeClass(type: string): string {
   switch (type) {
-    case 'radarr': return 'bg-accent-muted text-accent border-accent/30'
-    case 'sonarr': return 'bg-accent-muted text-accent border-accent/30'
-    case 'plex': return 'bg-accent-muted text-accent border-accent/30'
+    case 'radarr': return 'bg-accent-muted text-accent border-accent/40'
+    case 'sonarr': return 'bg-accent-muted text-accent border-accent/40'
+    case 'plex': return 'bg-accent-muted text-accent border-accent/40'
     default: return 'bg-highlight text-text-secondary border-border'
   }
 }

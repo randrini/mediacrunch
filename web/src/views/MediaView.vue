@@ -65,7 +65,7 @@
     <!-- Active compression job indicator -->
     <div
       v-if="currentJob && (currentJob.status === 'pending' || currentJob.status === 'running')"
-      class="bg-accent-muted border border-accent/30 rounded-md px-3 py-2 mb-4"
+      class="bg-accent-muted border border-accent/40 rounded-md px-3 py-2 mb-4"
     >
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div class="flex items-center space-x-3">
@@ -375,7 +375,7 @@
               <p class="text-lg font-semibold text-accent mt-1">{{ formatBytes(cleanupResult.freed_bytes) }}</p>
               <p class="text-xs text-text-secondary">disk space to free</p>
             </div>
-            <div v-if="cleanupResult.errors.length > 0" class="bg-danger/10 border border-danger/20 rounded-sm p-3">
+            <div v-if="cleanupResult.errors.length > 0" class="bg-danger/10 border border-danger/30 rounded-sm p-3">
               <p class="text-xs text-danger">{{ cleanupResult.errors.length }} files could not be accessed</p>
             </div>
             <div v-if="cleanupResult.deleted_files === 0" class="text-center">
@@ -545,9 +545,9 @@ const progressPercent = computed(() => {
 
 const typeBadgeClass = computed(() => {
   switch (instance.value?.type) {
-    case 'radarr': return 'bg-accent-muted text-accent border border-accent/30'
-    case 'sonarr': return 'bg-accent-muted text-accent border border-accent/30'
-    case 'plex': return 'bg-accent-muted text-accent border border-accent/30'
+    case 'radarr': return 'bg-accent-muted text-accent border border-accent/40'
+    case 'sonarr': return 'bg-accent-muted text-accent border border-accent/40'
+    case 'plex': return 'bg-accent-muted text-accent border border-accent/40'
     default: return 'bg-elevated text-text-secondary border border-border'
   }
 })

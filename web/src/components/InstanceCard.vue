@@ -158,9 +158,9 @@ const accentBg = computed(() => {
 
 const typeBadgeClass = computed(() => {
   switch (props.instance.type) {
-    case 'radarr': return 'bg-accent-muted text-accent border border-accent/30'
-    case 'sonarr': return 'bg-accent-muted text-accent border border-accent/30'
-    case 'plex': return 'bg-accent-muted text-accent border border-accent/30'
+    case 'radarr': return 'bg-accent-muted text-accent border border-accent/40'
+    case 'sonarr': return 'bg-accent-muted text-accent border border-accent/40'
+    case 'plex': return 'bg-accent-muted text-accent border border-accent/40'
     default: return 'bg-highlight text-text-secondary border border-border'
   }
 })

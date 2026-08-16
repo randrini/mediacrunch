@@ -113,7 +113,7 @@
             </div>
 
             <!-- Token acquired -->
-            <div v-if="plexToken" class="flex items-center gap-2 p-2 rounded-md bg-accent-muted border border-accent/30">
+            <div v-if="plexToken" class="flex items-center gap-2 p-2 rounded-md bg-accent-muted border border-accent/40">
               <svg class="w-4 h-4 text-accent shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
               </svg>
