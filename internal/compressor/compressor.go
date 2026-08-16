@@ -146,9 +146,15 @@ func (c *Compressor) compressItem(ctx context.Context, instance models.Instance,
 			return fmt.Errorf("marshal updated images: %w", err)
 		}
 
+		// Preserve the original baseline: on first compress, original_size is 0 so set it to total_size;
+		// on re-compress, keep the existing original_size (the true original).
+		originalSize := item.OriginalSize
+		if originalSize == 0 {
+			originalSize = item.TotalSize
+		}
 		_, err = c.DB.Exec(`
 			UPDATE media_items SET images = ?, total_size = ?, original_size = ?, compressed = 1 WHERE id = ?
-		`, imagesJSON, totalNewSize, item.TotalSize, item.ID)
+		`, imagesJSON, totalNewSize, originalSize, item.ID)
 		if err != nil {
 			return fmt.Errorf("update media item: %w", err)
 		}
@@ -418,6 +424,11 @@ func (c *Compressor) getMediaItems(job *models.CompressionJob) ([]models.MediaIt
 		FROM media_items WHERE instance_id = ?`
 	args := []interface{}{job.InstanceID}
 
+	// Skip already-compressed items unless recompress is explicitly enabled
+	if !job.Config.Recompress {
+		query += ` AND compressed = 0`
+	}
+
 	if len(job.MediaItemIDs) > 0 {
 		placeholders := ""
 		for i, id := range job.MediaItemIDs {
@@ -469,7 +480,11 @@ func (c *Compressor) lockPlexItems(ctx context.Context, instance models.Instance
 	client := clients.NewPlexClient(instance.Host, instance.APIKey)
 
 	// Only lock items being compressed in this job
-	query := `SELECT remote_id FROM media_items WHERE instance_id = ? AND compressed = 0`
+	compressedFilter := " AND compressed = 0"
+	if job.Config.Recompress {
+		compressedFilter = ""
+	}
+	query := `SELECT remote_id FROM media_items WHERE instance_id = ?` + compressedFilter
 	args := []interface{}{job.InstanceID}
 
 	if len(job.MediaItemIDs) > 0 {

@@ -55,6 +55,7 @@ type compressRequest struct {
 	Backup       *bool             `json:"backup"`
 	MinSavingKB  *int64            `json:"min_saving_kb"`
 	LockPlex     *bool             `json:"lock_plex"`
+	Recompress   *bool             `json:"recompress"`
 }
 
 // StartCompression handles POST /api/compress
@@ -509,6 +510,16 @@ func mergeSettings(req compressRequest, instSettings models.InstanceSettings) mo
 		out.LockPlex = *instSettings.LockPlex
 	default:
 		out.LockPlex = false
+	}
+
+	// Recompress: request (explicit, incl. false) > false.
+	// Default is false — don't re-compress already compressed items.
+	// This is a per-job decision, not a per-instance default.
+	switch {
+	case req.Recompress != nil:
+		out.Recompress = *req.Recompress
+	default:
+		out.Recompress = false
 	}
 
 	// MinSavingKB: request (explicit, incl. 0) > instance > 50.

@@ -266,6 +266,21 @@
                   />
                   <span class="text-sm text-slate-300">Lock Plex metadata fields</span>
                 </label>
+
+                <!-- Re-compress toggle -->
+                <label class="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    v-model="compressConfig.recompress"
+                    type="checkbox"
+                    class="rounded border-white/[0.08] bg-elevated text-accent focus:ring-accent/50"
+                  />
+                  <div>
+                    <span class="text-sm text-slate-300">Re-compress already compressed items</span>
+                    <p v-if="compressConfig.recompress" class="text-xs text-amber-400 mt-0.5">
+                      ⚠️ Re-compression may reduce quality further. Use only if you want to apply new settings.
+                    </p>
+                  </div>
+                </label>
               </div>
             </div>
           </div>
@@ -448,6 +463,7 @@ const compressConfig = ref<{
   min_size_kb: Record<string, number>
   backup: boolean
   lock_plex: boolean
+  recompress: boolean
 }>({
   quality: { ...ROLE_DEFAULTS.quality },
   max_width: { ...ROLE_DEFAULTS.max_width },
@@ -455,6 +471,7 @@ const compressConfig = ref<{
   min_size_kb: { ...ROLE_DEFAULTS.min_size_kb },
   backup: false,
   lock_plex: false,
+  recompress: false,
 })
 
 // Track previous default values so we can sync role overrides when defaults change
@@ -565,6 +582,8 @@ function handleSort(field: string, order: 'asc' | 'desc') {
 
 async function handleCompress(ids: string[]) {
   compressTargetIds.value = mediaStore.selectAllMode ? null : ids
+  // Reset recompress to false when opening modal
+  compressConfig.value.recompress = false
   // Refresh settings before showing modal so defaults are current
   await loadSettings()
   showCompressModal.value = true

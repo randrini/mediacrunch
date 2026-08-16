@@ -114,6 +114,7 @@ export interface CompressRequest {
   min_size_kb?: Record<string, number>
   backup?: boolean
   lock_plex?: boolean
+  recompress?: boolean
 }
 
 export function compressItems(data: CompressRequest): Promise<CompressionJob> {

@@ -172,6 +172,7 @@ type JobConfig struct {
 	Backup      bool             `json:"backup"`
 	MinSavingKB int64            `json:"min_saving_kb"`
 	LockPlex    bool             `json:"lock_plex"`
+	Recompress  bool             `json:"recompress"`
 }
 
 // UnmarshalConfig parses the config JSON column.
