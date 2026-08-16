@@ -4,22 +4,35 @@
 
 @layer base {
   :root {
-    --color-base: #0a0e1a;
-    --color-surface: #111827;
-    --color-elevated: #1e293b;
-    --color-accent: #06d6a0;
-    --color-accent-hover: #05b88a;
-    --color-accent-dim: rgba(6, 214, 160, 0.15);
-    --color-warning: #f59e0b;
-    --color-danger: #ef4444;
-    --color-text-primary: #e2e8f0;
-    --color-text-secondary: #94a3b8;
-    --color-border: rgba(30, 41, 59, 0.6);
+    /* Base layers — warm charcoal, not cold slate */
+    --bg-base: #141210;
+    --bg-surface: #1d1a17;
+    --bg-elevated: #26221e;
+    --bg-highlight: #322c26;
+
+    /* Borders */
+    --border-default: #2e2924;
+    --border-strong: #3d362f;
+
+    /* Text */
+    --text-primary: #ece5da;
+    --text-secondary: #a89f92;
+    --text-tertiary: #6f675c;
+
+    /* Accent — amber/gold, the warmth of media consumption */
+    --accent: #e8a33d;
+    --accent-hover: #f0b45a;
+    --accent-muted: #3a2d18;
+
+    /* Status */
+    --success: #7fb069;
+    --warning: #e3c14a;
+    --danger: #d96c5f;
   }
 
   body {
-    background-color: var(--color-base);
-    color: var(--color-text-primary);
+    background-color: var(--bg-base);
+    color: var(--text-primary);
     font-family: 'DM Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -27,7 +40,7 @@
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: #334155 #0f172a;
+    scrollbar-color: #3d362f #1d1a17;
   }
 
   *::-webkit-scrollbar {
@@ -36,16 +49,16 @@
   }
 
   *::-webkit-scrollbar-track {
-    background: #0f172a;
+    background: #1d1a17;
   }
 
   *::-webkit-scrollbar-thumb {
-    background-color: #334155;
+    background-color: #3d362f;
     border-radius: 3px;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background-color: #475569;
+    background-color: #4d453c;
   }
 
   /* Focus ring override for inputs */
@@ -57,7 +70,7 @@
 
   /* Checkbox accent color */
   input[type="checkbox"] {
-    accent-color: var(--color-accent);
+    accent-color: var(--accent);
   }
 
   /* Smooth transitions for interactive elements */
@@ -73,7 +86,7 @@
   }
 
   .size-badge {
-    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium;
+    @apply inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-mono font-medium;
   }
 
   .size-badge-large {
@@ -88,9 +101,9 @@
     @apply size-badge bg-accent/15 text-accent;
   }
 
-  /* Card with subtle glass effect */
+  /* Card — a real surface, not a glass wash */
   .card-glass {
-    @apply bg-white/[0.02] backdrop-blur-sm border border-white/[0.06] rounded-lg;
+    @apply bg-surface border border-border rounded-lg;
   }
 
   /* Monospace data styling */

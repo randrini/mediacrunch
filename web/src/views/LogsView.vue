@@ -2,8 +2,8 @@
   <div class="space-y-4">
     <!-- Page Header -->
     <div>
-      <h1 class="text-lg font-bold text-slate-100 tracking-tight">Activity Logs</h1>
-      <p class="mt-0.5 text-xs text-slate-500 font-mono">
+      <h1 class="text-2xl font-bold text-text-primary tracking-tight">Activity Logs</h1>
+      <p class="mt-0.5 text-xs text-text-tertiary font-mono">
         Real-time stream of compression jobs, scans, and system events
       </p>
     </div>
@@ -16,8 +16,8 @@
           v-for="level in levels"
           :key="level.value"
           @click="setLevel(level.value)"
-          class="px-2 py-0.5 rounded text-[11px] font-mono font-medium transition-base"
-          :class="activeLevel === level.value ? 'bg-accent text-base' : 'bg-white/[0.04] text-slate-400 hover:bg-white/[0.08]'"
+          class="px-2 py-0.5 rounded-sm text-[11px] font-mono font-medium transition-base"
+          :class="activeLevel === level.value ? 'bg-accent text-ink' : 'bg-highlight text-text-secondary hover:bg-elevated'"
         >
           {{ level.label }}
         </button>
@@ -30,7 +30,7 @@
           type="text"
           placeholder="Search logs..."
           @input="onSearch"
-          class="w-full bg-elevated border border-white/[0.06] rounded px-2.5 py-1 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent font-mono"
+          class="w-full bg-elevated border border-border rounded-sm px-2.5 py-1 text-xs text-text-primary placeholder-text-tertiary focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent font-mono"
         />
       </div>
 
@@ -48,7 +48,7 @@
         <button
           v-if="!showClearConfirm"
           @click="showClearConfirm = true"
-          class="bg-danger/10 border border-danger/20 text-danger hover:bg-danger/20 px-2.5 py-1 rounded text-[11px] font-medium transition-base"
+          class="bg-danger/10 border border-danger/20 text-danger hover:bg-danger/20 px-2.5 py-1 rounded-sm text-[11px] font-medium transition-base"
         >
           Clear Logs
         </button>
@@ -56,13 +56,13 @@
           <span class="text-[11px] text-danger">Clear all logs?</span>
           <button
             @click="handleClearLogs"
-            class="bg-danger text-white px-2 py-0.5 rounded text-[11px] font-medium hover:bg-red-600 transition-base"
+            class="bg-danger text-ink px-2 py-0.5 rounded-sm text-[11px] font-medium hover:bg-danger/80 transition-base"
           >
             Yes
           </button>
           <button
             @click="showClearConfirm = false"
-            class="bg-white/[0.04] text-slate-400 px-2 py-0.5 rounded text-[11px] font-medium hover:bg-white/[0.08] transition-base"
+            class="bg-highlight text-text-secondary px-2 py-0.5 rounded-sm text-[11px] font-medium hover:bg-elevated transition-base"
           >
             No
           </button>
@@ -73,7 +73,7 @@
     <!-- Error banner -->
     <div
       v-if="error"
-      class="bg-danger/10 border border-danger/20 rounded px-3 py-2 text-xs text-danger"
+      class="bg-danger/10 border border-danger/20 rounded-sm px-3 py-2 text-xs text-danger"
     >
       {{ error }}
     </div>
@@ -89,13 +89,13 @@
     <!-- Empty state -->
     <div
       v-else-if="!loading && logs.length === 0"
-      class="flex flex-col items-center justify-center py-14 text-slate-600"
+      class="flex flex-col items-center justify-center py-14 text-text-tertiary"
     >
       <svg class="w-10 h-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
-      <p class="text-xs font-medium text-slate-500">No logs found</p>
-      <p class="text-[11px] mt-0.5 text-slate-600">Try adjusting your filters or wait for new events</p>
+      <p class="text-xs font-medium text-text-tertiary">No logs found</p>
+      <p class="text-[11px] mt-0.5 text-text-tertiary">Try adjusting your filters or wait for new events</p>
     </div>
 
     <!-- Log list -->
@@ -103,11 +103,11 @@
       <div
         v-for="entry in logs"
         :key="entry.id"
-        class="bg-white/[0.015] rounded p-2.5 hover:bg-white/[0.03] border border-white/[0.03] hover:border-white/[0.06] transition-base"
+        class="bg-surface rounded-sm p-2.5 hover:bg-elevated border border-border hover:border-border-strong transition-base"
       >
         <div class="flex flex-col sm:flex-row sm:items-start gap-2.5">
           <!-- Timestamp -->
-          <div class="font-mono text-[11px] text-slate-600 whitespace-nowrap pt-0.5 sm:min-w-[4rem]">
+          <div class="font-mono text-[11px] text-text-tertiary whitespace-nowrap pt-0.5 sm:min-w-[4rem]">
             {{ formatTime(entry.created_at) }}
           </div>
 
@@ -115,14 +115,14 @@
           <div class="flex items-center flex-wrap gap-1 flex-shrink-0 pt-0.5">
             <!-- Level badge -->
             <span
-              class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium"
+              class="inline-flex items-center px-1.5 py-0.5 rounded-sm text-[10px] font-mono font-medium"
               :class="levelClass(entry.level)"
             >
               {{ entry.level.toUpperCase() }}
             </span>
             <!-- Source badge -->
             <span
-              class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium"
+              class="inline-flex items-center px-1.5 py-0.5 rounded-sm text-[10px] font-mono font-medium"
               :class="sourceClass(entry.source)"
             >
               {{ entry.source }}
@@ -130,7 +130,7 @@
             <!-- Instance badge -->
             <span
               v-if="entry.instance_id && instanceMap.get(entry.instance_id)"
-              class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
+              class="inline-flex items-center px-1.5 py-0.5 rounded-sm text-[10px] font-mono font-medium bg-accent-muted text-accent border border-accent/30"
             >
               {{ instanceMap.get(entry.instance_id) }}
             </span>
@@ -138,21 +138,21 @@
 
           <!-- Message -->
           <div class="flex-1 min-w-0">
-            <p class="text-xs text-slate-200 break-words">{{ entry.message }}</p>
+            <p class="text-xs text-text-primary break-words">{{ entry.message }}</p>
 
             <!-- Collapsible details -->
             <div v-if="entry.details" class="mt-1">
               <button
                 @click="toggleExpand(entry.id)"
-                class="text-[11px] text-slate-600 hover:text-slate-400 transition-base font-mono"
+                class="text-[11px] text-text-tertiary hover:text-text-secondary transition-base font-mono"
               >
                 {{ expandedIds.has(entry.id) ? '▲ Hide details' : '▼ Show details' }}
               </button>
               <div
                 v-if="expandedIds.has(entry.id)"
-                class="mt-1 p-2 rounded bg-base border border-white/[0.04]"
+                class="mt-1 p-2 rounded-sm bg-base border border-border"
               >
-                <pre class="font-mono text-[11px] text-slate-500 whitespace-pre-wrap break-words">{{ entry.details }}</pre>
+                <pre class="font-mono text-[11px] text-text-tertiary whitespace-pre-wrap break-words">{{ entry.details }}</pre>
               </div>
             </div>
           </div>
@@ -165,25 +165,25 @@
       v-if="total > 0"
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-2"
     >
-      <p class="text-[11px] text-slate-600 font-mono">
-        Showing <span class="text-slate-400">{{ showingFrom }}</span>
-        <span v-if="showingFrom !== showingTo">–<span class="text-slate-400">{{ showingTo }}</span></span>
-        of <span class="text-slate-400">{{ total }}</span>
+      <p class="text-[11px] text-text-tertiary font-mono">
+        Showing <span class="text-text-secondary">{{ showingFrom }}</span>
+        <span v-if="showingFrom !== showingTo">–<span class="text-text-secondary">{{ showingTo }}</span></span>
+        of <span class="text-text-secondary">{{ total }}</span>
       </p>
       <div class="flex items-center flex-wrap gap-1.5">
         <button
           @click="prevPage"
           :disabled="offset === 0"
-          class="px-2.5 py-1 rounded text-[11px] font-medium transition-base"
-          :class="offset === 0 ? 'bg-white/[0.02] text-slate-700 cursor-not-allowed' : 'bg-white/[0.04] text-slate-400 hover:bg-white/[0.08]'"
+          class="px-2.5 py-1 rounded-sm text-[11px] font-medium transition-base"
+          :class="offset === 0 ? 'bg-surface text-text-tertiary cursor-not-allowed' : 'bg-highlight text-text-secondary hover:bg-elevated'"
         >
           Previous
         </button>
         <button
           @click="nextPage"
           :disabled="offset + limit >= total"
-          class="px-2.5 py-1 rounded text-[11px] font-medium transition-base"
-          :class="offset + limit >= total ? 'bg-white/[0.02] text-slate-700 cursor-not-allowed' : 'bg-white/[0.04] text-slate-400 hover:bg-white/[0.08]'"
+          class="px-2.5 py-1 rounded-sm text-[11px] font-medium transition-base"
+          :class="offset + limit >= total ? 'bg-surface text-text-tertiary cursor-not-allowed' : 'bg-highlight text-text-secondary hover:bg-elevated'"
         >
           Next
         </button>
@@ -300,19 +300,19 @@ function levelClass(level: string): string {
   switch (level) {
     case 'error': return 'bg-danger/10 text-danger border border-danger/20'
     case 'warn': return 'bg-warning/10 text-warning border border-warning/20'
-    case 'info': return 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-    case 'debug': return 'bg-white/[0.03] text-slate-500 border border-white/[0.06]'
-    default: return 'bg-white/[0.03] text-slate-500 border border-white/[0.06]'
+    case 'info': return 'bg-success/10 text-success border border-success/20'
+    case 'debug': return 'bg-highlight text-text-tertiary border border-border'
+    default: return 'bg-highlight text-text-tertiary border border-border'
   }
 }
 
 function sourceClass(source: string): string {
   switch (source) {
-    case 'scanner': return 'bg-accent/10 text-accent border border-accent/20'
-    case 'compressor': return 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
-    case 'api': return 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-    case 'system': return 'bg-white/[0.03] text-slate-500 border border-white/[0.06]'
-    default: return 'bg-white/[0.03] text-slate-500 border border-white/[0.06]'
+    case 'scanner': return 'bg-accent-muted text-accent border border-accent/30'
+    case 'compressor': return 'bg-success/10 text-success border border-success/20'
+    case 'api': return 'bg-highlight text-text-secondary border border-border'
+    case 'system': return 'bg-highlight text-text-tertiary border border-border'
+    default: return 'bg-highlight text-text-tertiary border border-border'
   }
 }
 

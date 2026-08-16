@@ -2,10 +2,10 @@
   <div>
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-      <h1 class="text-xl font-bold text-slate-100">Instances</h1>
+      <h1 class="text-2xl font-bold text-text-primary tracking-tight">Instances</h1>
       <button
         @click="openCreateModal"
-        class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-accent text-white hover:bg-accent-hover transition-base"
+        class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-accent text-ink hover:bg-accent-hover transition-base"
       >
         <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -20,25 +20,25 @@
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
       </svg>
-      <p class="mt-3 text-slate-400 text-sm">Loading instances...</p>
+      <p class="mt-3 text-text-secondary text-sm">Loading instances...</p>
     </div>
 
     <!-- Error -->
-    <div v-else-if="store.error" class="bg-danger/10 border border-danger/30 rounded-lg p-4 mb-4">
+    <div v-else-if="store.error" class="bg-danger/10 border border-danger/30 rounded-md p-4 mb-4">
       <p class="text-danger text-sm">{{ store.error }}</p>
       <button @click="store.fetchInstances()" class="mt-2 text-sm text-danger hover:text-danger underline">Retry</button>
     </div>
 
     <!-- Empty State -->
     <div v-else-if="store.instances.length === 0" class="text-center py-16">
-      <svg class="w-16 h-16 mx-auto text-slate-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+      <svg class="w-16 h-16 mx-auto text-text-tertiary mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
-      <h2 class="text-xl font-semibold text-slate-300 mb-2">No instances yet</h2>
-      <p class="text-slate-500 text-sm mb-4">Add your first Radarr, Sonarr, or Plex instance to get started.</p>
+      <h2 class="text-xl font-semibold text-text-secondary mb-2">No instances yet</h2>
+      <p class="text-text-tertiary text-sm mb-4">Add your first Radarr, Sonarr, or Plex instance to get started.</p>
       <button
         @click="openCreateModal"
-        class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-accent text-white hover:bg-accent-hover transition-base"
+        class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-accent text-ink hover:bg-accent-hover transition-base"
       >
         <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -78,21 +78,21 @@
       >
         <div class="absolute inset-0 bg-base/80 backdrop-blur-md" @click="deletingInstance = null" />
         <div class="relative card-glass w-full max-w-sm mx-4 p-5">
-          <h3 class="text-lg font-semibold text-slate-100 mb-2">Delete Instance</h3>
-          <p class="text-sm text-slate-400 mb-4">
-            Are you sure you want to delete <span class="font-medium text-slate-200">{{ deletingInstance.name }}</span>?
+          <h3 class="text-lg font-semibold text-text-primary mb-2">Delete Instance</h3>
+          <p class="text-sm text-text-secondary mb-4">
+            Are you sure you want to delete <span class="font-medium text-text-primary">{{ deletingInstance.name }}</span>?
             This will also remove all associated media items and compression results.
           </p>
           <div class="flex justify-end space-x-3">
             <button
               @click="deletingInstance = null"
-              class="px-3 py-1.5 text-sm font-medium text-slate-300 bg-elevated rounded-md hover:bg-slate-700 transition-base"
+              class="px-3 py-1.5 text-sm font-medium text-text-secondary bg-elevated rounded-md hover:bg-highlight transition-base"
             >
               Cancel
             </button>
             <button
               @click="handleDelete"
-              class="px-3 py-1.5 text-sm font-medium text-white bg-danger rounded-md hover:bg-red-600 transition-base"
+              class="px-3 py-1.5 text-sm font-medium text-ink bg-danger rounded-md hover:bg-danger/80 transition-base"
             >
               Delete
             </button>

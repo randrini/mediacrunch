@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen bg-base flex flex-col">
     <!-- Skip to main content link -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-accent focus:text-white focus:px-4 focus:py-2 focus:rounded">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-accent focus:text-ink focus:px-4 focus:py-2 focus:rounded">
       Skip to main content
     </a>
     <!-- Top Nav -->
-    <nav class="sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-white/[0.06]">
+    <nav class="sticky top-0 z-40 bg-surface/90 backdrop-blur-md border-b border-border">
       <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-12">
           <!-- Left: Brand + Nav Links -->
@@ -14,34 +14,34 @@
               <svg class="w-6 h-6 text-accent transition-base group-hover:scale-105" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span class="text-xs font-bold text-slate-100 tracking-tight font-mono">MediaCrunch</span>
+              <span class="text-sm font-bold text-text-primary tracking-tight font-mono">MediaCrunch</span>
             </router-link>
             <div class="hidden md:flex space-x-1">
               <router-link
                 to="/"
-                class="px-2 py-0.5 rounded text-[11px] font-medium transition-base"
-                :class="isActive('/') ? 'bg-accent/10 text-accent' : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04]'"
+                class="px-2 py-0.5 rounded-sm text-[11px] font-medium transition-base"
+                :class="isActive('/') ? 'bg-accent-muted text-accent' : 'text-text-secondary hover:text-text-primary hover:bg-highlight'"
               >
                 Dashboard
               </router-link>
               <router-link
                 to="/instances"
-                class="px-2 py-0.5 rounded text-[11px] font-medium transition-base"
-                :class="isActive('/instances') ? 'bg-accent/10 text-accent' : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04]'"
+                class="px-2 py-0.5 rounded-sm text-[11px] font-medium transition-base"
+                :class="isActive('/instances') ? 'bg-accent-muted text-accent' : 'text-text-secondary hover:text-text-primary hover:bg-highlight'"
               >
                 Instances
               </router-link>
               <router-link
                 to="/settings"
-                class="px-2 py-0.5 rounded text-[11px] font-medium transition-base"
-                :class="isActive('/settings') ? 'bg-accent/10 text-accent' : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04]'"
+                class="px-2 py-0.5 rounded-sm text-[11px] font-medium transition-base"
+                :class="isActive('/settings') ? 'bg-accent-muted text-accent' : 'text-text-secondary hover:text-text-primary hover:bg-highlight'"
               >
                 Settings
               </router-link>
               <router-link
                 to="/logs"
-                class="px-2 py-0.5 rounded text-[11px] font-medium transition-base"
-                :class="isActive('/logs') ? 'bg-accent/10 text-accent' : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04]'"
+                class="px-2 py-0.5 rounded-sm text-[11px] font-medium transition-base"
+                :class="isActive('/logs') ? 'bg-accent-muted text-accent' : 'text-text-secondary hover:text-text-primary hover:bg-highlight'"
               >
                 Logs
               </router-link>
@@ -56,7 +56,7 @@
                 v-model="selectedInstanceId"
                 @change="onInstanceChange"
                 aria-label="Select instance"
-                class="bg-elevated/80 text-slate-100 border border-white/[0.06] rounded px-2.5 py-1 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent"
+                class="bg-elevated text-text-primary border border-border rounded-sm px-2.5 py-1 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent"
               >
                 <option value="" disabled>Select instance...</option>
                 <option
@@ -70,7 +70,7 @@
             </div>
             <button
               @click="mobileMenuOpen = !mobileMenuOpen"
-              class="md:hidden inline-flex items-center justify-center w-8 h-8 rounded text-slate-300 hover:text-slate-100 hover:bg-white/[0.06] transition-base"
+              class="md:hidden inline-flex items-center justify-center w-8 h-8 rounded-sm text-text-secondary hover:text-text-primary hover:bg-highlight transition-base"
               aria-label="Toggle navigation menu"
               :aria-expanded="mobileMenuOpen"
             >
@@ -93,37 +93,37 @@
           leave-from-class="opacity-100 translate-y-0"
           leave-to-class="opacity-0 -translate-y-2"
         >
-          <div v-show="mobileMenuOpen" class="md:hidden pb-3 pt-1 border-t border-white/[0.06]">
+          <div v-show="mobileMenuOpen" class="md:hidden pb-3 pt-1 border-t border-border">
             <nav class="flex flex-col space-y-1">
               <router-link
                 to="/"
                 @click="mobileMenuOpen = false"
-                class="px-3 py-2 rounded text-sm font-medium transition-base"
-                :class="isActive('/') ? 'bg-accent/10 text-accent' : 'text-slate-300 hover:text-slate-100 hover:bg-white/[0.04]'"
+                class="px-3 py-2 rounded-sm text-sm font-medium transition-base"
+                :class="isActive('/') ? 'bg-accent-muted text-accent' : 'text-text-secondary hover:text-text-primary hover:bg-highlight'"
               >
                 Dashboard
               </router-link>
               <router-link
                 to="/instances"
                 @click="mobileMenuOpen = false"
-                class="px-3 py-2 rounded text-sm font-medium transition-base"
-                :class="isActive('/instances') ? 'bg-accent/10 text-accent' : 'text-slate-300 hover:text-slate-100 hover:bg-white/[0.04]'"
+                class="px-3 py-2 rounded-sm text-sm font-medium transition-base"
+                :class="isActive('/instances') ? 'bg-accent-muted text-accent' : 'text-text-secondary hover:text-text-primary hover:bg-highlight'"
               >
                 Instances
               </router-link>
               <router-link
                 to="/settings"
                 @click="mobileMenuOpen = false"
-                class="px-3 py-2 rounded text-sm font-medium transition-base"
-                :class="isActive('/settings') ? 'bg-accent/10 text-accent' : 'text-slate-300 hover:text-slate-100 hover:bg-white/[0.04]'"
+                class="px-3 py-2 rounded-sm text-sm font-medium transition-base"
+                :class="isActive('/settings') ? 'bg-accent-muted text-accent' : 'text-text-secondary hover:text-text-primary hover:bg-highlight'"
               >
                 Settings
               </router-link>
               <router-link
                 to="/logs"
                 @click="mobileMenuOpen = false"
-                class="px-3 py-2 rounded text-sm font-medium transition-base"
-                :class="isActive('/logs') ? 'bg-accent/10 text-accent' : 'text-slate-300 hover:text-slate-100 hover:bg-white/[0.04]'"
+                class="px-3 py-2 rounded-sm text-sm font-medium transition-base"
+                :class="isActive('/logs') ? 'bg-accent-muted text-accent' : 'text-text-secondary hover:text-text-primary hover:bg-highlight'"
               >
                 Logs
               </router-link>
@@ -133,7 +133,7 @@
                 v-model="selectedInstanceId"
                 @change="onInstanceChange"
                 aria-label="Select instance"
-                class="w-full bg-elevated/80 text-slate-100 border border-white/[0.06] rounded px-2.5 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent"
+                class="w-full bg-elevated text-text-primary border border-border rounded-sm px-2.5 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent"
               >
                 <option value="" disabled>Select instance...</option>
                 <option
@@ -158,9 +158,9 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-white/[0.06] py-2">
+    <footer class="border-t border-border py-2">
       <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p class="text-center text-[11px] text-slate-500 font-mono">
+        <p class="text-center text-[11px] text-text-tertiary font-mono">
           MediaCrunch {{ version || '...' }} &mdash; Media image compression for Radarr, Sonarr &amp; Plex
         </p>
       </div>

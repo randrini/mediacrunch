@@ -35,12 +35,12 @@ defineEmits<{
 
 const buttonClass = computed(() => {
   if (props.disabled && !props.loading) {
-    return 'bg-elevated text-slate-600 cursor-not-allowed'
+    return 'bg-elevated text-text-tertiary cursor-not-allowed'
   }
   const variant = props.variant || 'accent'
   if (variant === 'primary') {
-    return 'bg-accent hover:bg-accent-hover text-base'
+    return 'bg-accent hover:bg-accent-hover text-ink'
   }
-  return 'bg-accent hover:bg-accent-hover text-base'
+  return 'bg-accent hover:bg-accent-hover text-ink'
 })
 </script>

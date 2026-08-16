@@ -2,11 +2,11 @@
   <div>
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-      <h1 class="text-lg font-semibold text-slate-100">Dashboard</h1>
+      <h1 class="text-2xl font-bold text-text-primary tracking-tight">Dashboard</h1>
       <button
         v-if="store.instances.length > 0"
         @click="router.push('/instances')"
-        class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-accent text-white hover:bg-accent-hover transition-base"
+        class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-accent text-ink hover:bg-accent-hover transition-base"
       >
         <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -21,27 +21,27 @@
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
       </svg>
-      <p class="mt-3 text-slate-400 text-sm">Loading instances...</p>
+      <p class="mt-3 text-text-secondary text-sm">Loading instances...</p>
     </div>
 
     <!-- Error -->
-    <div v-else-if="store.error" class="bg-danger/10 border border-danger/30 rounded-lg p-4 mb-4">
+    <div v-else-if="store.error" class="bg-danger/10 border border-danger/30 rounded-md p-4 mb-4">
       <p class="text-danger text-sm">{{ store.error }}</p>
       <button @click="store.fetchInstances()" class="mt-2 text-sm text-danger hover:text-danger underline">Retry</button>
     </div>
 
     <!-- Empty State -->
     <div v-else-if="store.instances.length === 0" class="text-center py-16">
-      <svg class="w-16 h-16 mx-auto text-slate-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+      <svg class="w-16 h-16 mx-auto text-text-tertiary mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
-      <h2 class="text-xl font-semibold text-slate-300 mb-2">Welcome to MediaCrunch</h2>
-      <p class="text-slate-500 text-sm mb-4 max-w-md mx-auto">
+      <h2 class="text-xl font-semibold text-text-secondary mb-2">Welcome to MediaCrunch</h2>
+      <p class="text-text-tertiary text-sm mb-4 max-w-md mx-auto">
         Get started by adding your first Radarr, Sonarr, or Plex instance to begin compressing media images.
       </p>
       <button
         @click="router.push('/instances')"
-        class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-accent text-white hover:bg-accent-hover transition-base"
+        class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-accent text-ink hover:bg-accent-hover transition-base"
       >
         <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -58,7 +58,7 @@
       </div>
 
       <!-- Instance Grid -->
-      <h2 class="text-lg font-semibold text-slate-100 mb-4">Instances</h2>
+      <h2 class="text-lg font-semibold text-text-primary mb-4">Instances</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
         <InstanceCard
           v-for="inst in store.instances"
@@ -75,32 +75,32 @@
 
       <!-- Recent Jobs -->
       <div v-if="recentJobs.length > 0">
-        <h2 class="text-lg font-semibold text-slate-100 mb-4">Recent Compression Jobs</h2>
+        <h2 class="text-lg font-semibold text-text-primary mb-4">Recent Compression Jobs</h2>
         <div class="card-glass overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-white/[0.06]">
+            <table class="min-w-full divide-y divide-border">
               <thead class="bg-elevated">
                 <tr>
-                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Instance</th>
-                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Status</th>
-                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Progress</th>
-                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Saved</th>
-                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-400 uppercase">Date</th>
+                  <th class="px-3 py-2 text-left text-[11px] font-medium text-text-tertiary uppercase tracking-wider">Instance</th>
+                  <th class="px-3 py-2 text-left text-[11px] font-medium text-text-tertiary uppercase tracking-wider">Status</th>
+                  <th class="px-3 py-2 text-left text-[11px] font-medium text-text-tertiary uppercase tracking-wider">Progress</th>
+                  <th class="px-3 py-2 text-left text-[11px] font-medium text-text-tertiary uppercase tracking-wider">Saved</th>
+                  <th class="px-3 py-2 text-left text-[11px] font-medium text-text-tertiary uppercase tracking-wider">Date</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-white/[0.06]">
-                <tr v-for="job in recentJobs" :key="job.id" class="hover:bg-elevated/50 transition-base">
-                  <td class="px-3 py-2 text-sm text-slate-300">{{ getInstanceName(job.instance_id) }}</td>
+              <tbody class="divide-y divide-border">
+                <tr v-for="job in recentJobs" :key="job.id" class="hover:bg-highlight/50 transition-base">
+                  <td class="px-3 py-2 text-sm text-text-secondary">{{ getInstanceName(job.instance_id) }}</td>
                   <td class="px-3 py-2">
                     <span :class="statusBadge(job.status)">{{ job.status }}</span>
                   </td>
-                  <td class="px-3 py-2 text-sm text-slate-300 font-mono tabular-nums">
+                  <td class="px-3 py-2 text-sm text-text-secondary font-mono tabular-nums">
                     {{ job.processed_items }}/{{ job.total_items }}
                   </td>
                   <td class="px-3 py-2 text-sm text-accent font-mono tabular-nums">
                     {{ formatSize(job.saved_bytes) }}
                   </td>
-                  <td class="px-3 py-2 text-sm text-slate-400">
+                  <td class="px-3 py-2 text-sm text-text-secondary">
                     {{ formatDate(job.created_at) }}
                   </td>
                 </tr>
@@ -175,12 +175,12 @@ function handleDelete(instance: any) {
 }
 
 function statusBadge(status: string): string {
-  const base = 'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium'
+  const base = 'inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium'
   switch (status) {
-    case 'completed': return `${base} bg-accent/10 text-accent`
-    case 'running': return `${base} bg-sky-900/20 text-sky-300`
+    case 'completed': return `${base} bg-accent-muted text-accent`
+    case 'running': return `${base} bg-accent-muted text-accent`
     case 'failed': return `${base} bg-danger/10 text-danger`
-    case 'cancelled': return `${base} bg-elevated text-slate-500`
+    case 'cancelled': return `${base} bg-elevated text-text-tertiary`
     default: return `${base} bg-warning/10 text-warning`
   }
 }

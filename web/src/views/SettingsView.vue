@@ -3,8 +3,8 @@
     <!-- Page Header -->
     <div class="flex items-end justify-between mb-6">
       <div>
-        <h1 class="text-xl font-bold text-slate-100 tracking-tight">Settings</h1>
-        <p class="text-xs text-slate-500 mt-1">
+        <h1 class="text-2xl font-bold text-text-primary tracking-tight">Settings</h1>
+        <p class="text-xs text-text-tertiary mt-1">
           {{ instancesStore.instances.length }} instance{{ instancesStore.instances.length === 1 ? '' : 's' }} configured
         </p>
       </div>
@@ -16,19 +16,19 @@
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
       </svg>
-      <p class="mt-3 text-slate-500 text-xs">Loading instance settings...</p>
+      <p class="mt-3 text-text-tertiary text-xs">Loading instance settings...</p>
     </div>
 
     <!-- Empty State -->
     <div v-else-if="instancesStore.instances.length === 0" class="text-center py-16">
-      <svg class="w-16 h-16 mx-auto text-slate-700 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+      <svg class="w-16 h-16 mx-auto text-text-tertiary mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
-      <h2 class="text-base font-semibold text-slate-300 mb-1.5">No instances yet</h2>
-      <p class="text-slate-500 text-xs mb-5">Add an instance first to configure its compression settings.</p>
+      <h2 class="text-[16px] font-semibold text-text-secondary mb-1.5">No instances yet</h2>
+      <p class="text-text-tertiary text-xs mb-5">Add an instance first to configure its compression settings.</p>
       <router-link
         to="/instances"
-        class="inline-flex items-center px-4 py-2 text-xs font-medium rounded bg-accent text-base hover:bg-accent-hover transition-base"
+        class="inline-flex items-center px-4 py-2 text-xs font-medium rounded-md bg-accent text-ink hover:bg-accent-hover transition-base"
       >
         <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -47,21 +47,21 @@
         :class="{ 'ring-1 ring-accent/40': inst.id === instanceIdFromRoute }"
       >
         <!-- Card Header -->
-        <div class="flex items-start justify-between gap-3 p-4 border-b border-white/[0.06]">
+        <div class="flex items-start justify-between gap-3 p-4 border-b border-border">
           <div class="flex items-start gap-3 min-w-0">
             <div
-              class="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold font-mono shrink-0 border"
+              class="w-9 h-9 rounded-md flex items-center justify-center text-sm font-bold font-mono shrink-0 border"
               :class="typeIconClass(inst.type)"
             >
               {{ typeIconText(inst.type) }}
             </div>
             <div class="min-w-0">
-              <h3 class="text-sm font-semibold text-slate-100 truncate">{{ inst.name }}</h3>
-              <p class="text-xs text-slate-500 font-mono truncate">{{ inst.host }}</p>
+              <h3 class="text-sm font-semibold text-text-primary truncate">{{ inst.name }}</h3>
+              <p class="text-xs text-text-tertiary font-mono truncate">{{ inst.host }}</p>
             </div>
           </div>
           <span
-            class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium capitalize shrink-0 border"
+            class="inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-medium capitalize shrink-0 border"
             :class="typeBadgeClass(inst.type)"
           >
             {{ inst.type }}
@@ -72,35 +72,35 @@
         <div v-if="forms[inst.id]" class="p-4 space-y-5 flex-1" @input="dirty[inst.id] = true">
           <!-- Defaults -->
           <div class="space-y-3">
-            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Defaults</h4>
+            <h4 class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Defaults</h4>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <label class="block">
-                <span class="text-[10px] text-slate-500 block mb-1">Quality</span>
+                <span class="text-[10px] text-text-tertiary block mb-1">Quality</span>
                 <input
                   type="number"
                   min="1"
                   max="100"
                   v-model.number="forms[inst.id].quality_default"
-                  class="bg-elevated border border-white/[0.06] rounded px-2 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
+                  class="bg-elevated border border-border rounded-sm px-2 py-1.5 text-text-primary focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
                 />
               </label>
               <label class="block">
-                <span class="text-[10px] text-slate-500 block mb-1">Max Width</span>
+                <span class="text-[10px] text-text-tertiary block mb-1">Max Width</span>
                 <input
                   type="number"
                   min="100"
                   max="8000"
                   v-model.number="forms[inst.id].max_width_default"
-                  class="bg-elevated border border-white/[0.06] rounded px-2 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
+                  class="bg-elevated border border-border rounded-sm px-2 py-1.5 text-text-primary focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
                 />
               </label>
               <label class="block">
-                <span class="text-[10px] text-slate-500 block mb-1">Min Saving (KB)</span>
+                <span class="text-[10px] text-text-tertiary block mb-1">Min Saving (KB)</span>
                 <input
                   type="number"
                   min="0"
                   v-model.number="forms[inst.id].min_saving_kb"
-                  class="bg-elevated border border-white/[0.06] rounded px-2 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
+                  class="bg-elevated border border-border rounded-sm px-2 py-1.5 text-text-primary focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
                 />
               </label>
             </div>
@@ -111,11 +111,11 @@
             <button
               type="button"
               @click="expandedRoles[inst.id] = !expandedRoles[inst.id]"
-              class="w-full flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider hover:text-slate-300 transition-base py-1"
+              class="w-full flex items-center justify-between text-xs font-semibold text-text-secondary uppercase tracking-wider hover:text-text-primary transition-base py-1"
             >
               <span>Role Overrides</span>
               <svg
-                class="w-4 h-4 text-slate-500 transition-transform duration-200"
+                class="w-4 h-4 text-text-tertiary transition-transform duration-200"
                 :class="{ 'rotate-90': expandedRoles[inst.id] }"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -130,11 +130,11 @@
               <div
                 v-for="role in rolesForType(inst.type)"
                 :key="role"
-                class="bg-white/[0.02] border border-white/[0.06] rounded-lg p-3"
+                class="bg-highlight border border-border rounded-md p-3"
               >
                 <div class="flex items-center justify-between mb-2.5">
-                  <span class="text-xs font-medium text-slate-300">{{ ROLE_LABELS[role] || role }}</span>
-                  <span class="inline-flex items-center text-[10px] text-slate-500 font-mono">
+                  <span class="text-xs font-medium text-text-secondary">{{ ROLE_LABELS[role] || role }}</span>
+                  <span class="inline-flex items-center text-[10px] text-text-tertiary font-mono">
                     <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                     </svg>
@@ -143,32 +143,32 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <label class="block">
-                    <span class="text-[10px] text-slate-500 block mb-1">Quality</span>
+                    <span class="text-[10px] text-text-tertiary block mb-1">Quality</span>
                     <input
                       type="number"
                       min="1"
                       max="100"
                       v-model.number="forms[inst.id].roles[role].quality"
-                      class="bg-elevated border border-white/[0.06] rounded px-2 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
+                      class="bg-elevated border border-border rounded-sm px-2 py-1.5 text-text-primary focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
                     />
                   </label>
                   <label class="block">
-                    <span class="text-[10px] text-slate-500 block mb-1">Max Width</span>
+                    <span class="text-[10px] text-text-tertiary block mb-1">Max Width</span>
                     <input
                       type="number"
                       min="100"
                       max="8000"
                       v-model.number="forms[inst.id].roles[role].max_width"
-                      class="bg-elevated border border-white/[0.06] rounded px-2 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
+                      class="bg-elevated border border-border rounded-sm px-2 py-1.5 text-text-primary focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
                     />
                   </label>
                   <label class="block">
-                    <span class="text-[10px] text-slate-500 block mb-1">Min Size (KB)</span>
+                    <span class="text-[10px] text-text-tertiary block mb-1">Min Size (KB)</span>
                     <input
                       type="number"
                       min="0"
                       v-model.number="forms[inst.id].roles[role].min_size_kb"
-                      class="bg-elevated border border-white/[0.06] rounded px-2 py-1.5 text-slate-100 focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
+                      class="bg-elevated border border-border rounded-sm px-2 py-1.5 text-text-primary focus:ring-1 focus:ring-accent focus:border-transparent w-full font-mono text-xs"
                     />
                   </label>
                 </div>
@@ -178,13 +178,13 @@
 
           <!-- Options -->
           <div class="space-y-2">
-            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Options</h4>
+            <h4 class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Options</h4>
 
             <!-- Backup Toggle -->
             <div class="flex items-center justify-between py-2">
               <div class="pr-4">
-                <label class="text-xs font-medium text-slate-300">Create backup</label>
-                <p class="text-[10px] text-slate-500 mt-0.5">Create a .bak copy before overwriting images</p>
+                <label class="text-xs font-medium text-text-secondary">Create backup</label>
+                <p class="text-[10px] text-text-tertiary mt-0.5">Create a .bak copy before overwriting images</p>
               </div>
               <button
                 type="button"
@@ -192,7 +192,7 @@
                 :aria-checked="forms[inst.id].backup"
                 @click="forms[inst.id].backup = !forms[inst.id].backup; dirty[inst.id] = true"
                 class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-1 focus:ring-accent focus:ring-offset-1 focus:ring-offset-base"
-                :class="forms[inst.id].backup ? 'bg-accent' : 'bg-slate-600'"
+                :class="forms[inst.id].backup ? 'bg-accent' : 'bg-highlight'"
               >
                 <span
                   class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform"
@@ -204,8 +204,8 @@
             <!-- Lock Plex Toggle (Plex only) -->
             <div v-if="inst.type === 'plex'" class="flex items-center justify-between py-2">
               <div class="pr-4">
-                <label class="text-xs font-medium text-slate-300">Lock Plex metadata</label>
-                <p class="text-[10px] text-slate-500 mt-0.5">Auto-lock Plex metadata before compression</p>
+                <label class="text-xs font-medium text-text-secondary">Lock Plex metadata</label>
+                <p class="text-[10px] text-text-tertiary mt-0.5">Auto-lock Plex metadata before compression</p>
               </div>
               <button
                 type="button"
@@ -213,7 +213,7 @@
                 :aria-checked="forms[inst.id].lock_plex"
                 @click="forms[inst.id].lock_plex = !forms[inst.id].lock_plex; dirty[inst.id] = true"
                 class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-1 focus:ring-accent focus:ring-offset-1 focus:ring-offset-base"
-                :class="forms[inst.id].lock_plex ? 'bg-accent' : 'bg-slate-600'"
+                :class="forms[inst.id].lock_plex ? 'bg-accent' : 'bg-highlight'"
               >
                 <span
                   class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform"
@@ -226,8 +226,8 @@
           <!-- Inline Toast -->
           <div
             v-if="toasts[inst.id]"
-            class="rounded p-2.5 text-xs"
-            :class="toasts[inst.id]!.type === 'success' ? 'bg-accent/10 border border-accent/20 text-accent' : 'bg-danger/10 border border-danger/20 text-danger'"
+            class="rounded-sm p-2.5 text-xs"
+            :class="toasts[inst.id]!.type === 'success' ? 'bg-accent-muted border border-accent/20 text-accent' : 'bg-danger/10 border border-danger/20 text-danger'"
           >
             <div class="flex items-center justify-between">
               <p>{{ toasts[inst.id]!.message }}</p>
@@ -237,11 +237,11 @@
         </div>
 
         <!-- Card Footer -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 border-t border-white/[0.06] mt-auto">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 border-t border-border mt-auto">
           <button
             type="button"
             @click="resetInstance(inst.id)"
-            class="w-full sm:w-auto justify-center bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 font-medium px-3 py-1.5 rounded transition-base text-xs"
+            class="w-full sm:w-auto justify-center bg-highlight hover:bg-elevated text-text-secondary font-medium px-3 py-1.5 rounded-md transition-base text-xs"
           >
             Reset to Defaults
           </button>
@@ -249,7 +249,7 @@
             type="button"
             @click="saveInstance(inst.id)"
             :disabled="saving[inst.id]"
-            class="w-full sm:w-auto justify-center bg-accent hover:bg-accent-hover disabled:bg-accent/50 disabled:cursor-not-allowed text-base font-medium px-3 py-1.5 rounded transition-base text-xs inline-flex items-center"
+            class="w-full sm:w-auto justify-center bg-accent hover:bg-accent-hover disabled:bg-accent/50 disabled:cursor-not-allowed text-ink font-medium px-3 py-1.5 rounded-md transition-base text-xs inline-flex items-center"
           >
             <svg v-if="saving[inst.id]" class="animate-spin h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -340,19 +340,19 @@ function typeIconText(type: string): string {
 
 function typeIconClass(type: string): string {
   switch (type) {
-    case 'radarr': return 'bg-blue-500/15 text-blue-400 border-blue-500/25'
-    case 'sonarr': return 'bg-purple-500/15 text-purple-400 border-purple-500/25'
-    case 'plex': return 'bg-orange-500/15 text-orange-400 border-orange-500/25'
-    default: return 'bg-white/[0.04] text-slate-400 border-white/[0.06]'
+    case 'radarr': return 'bg-accent-muted text-accent border-accent/30'
+    case 'sonarr': return 'bg-accent-muted text-accent border-accent/30'
+    case 'plex': return 'bg-accent-muted text-accent border-accent/30'
+    default: return 'bg-highlight text-text-secondary border-border'
   }
 }
 
 function typeBadgeClass(type: string): string {
   switch (type) {
-    case 'radarr': return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-    case 'sonarr': return 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-    case 'plex': return 'bg-orange-500/10 text-orange-400 border-orange-500/20'
-    default: return 'bg-white/[0.04] text-slate-400 border-white/[0.06]'
+    case 'radarr': return 'bg-accent-muted text-accent border-accent/30'
+    case 'sonarr': return 'bg-accent-muted text-accent border-accent/30'
+    case 'plex': return 'bg-accent-muted text-accent border-accent/30'
+    default: return 'bg-highlight text-text-secondary border-border'
   }
 }
 

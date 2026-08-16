@@ -11,30 +11,30 @@
       />
       <!-- Modal -->
       <div class="relative card-glass w-full max-w-lg mx-4 p-4">
-        <h2 class="text-lg font-semibold text-slate-100 mb-4">
+        <h2 class="text-lg font-semibold text-text-primary mb-4">
           {{ isEdit ? 'Edit Instance' : 'Add Instance' }}
         </h2>
 
         <form @submit.prevent="handleSubmit" class="space-y-3">
           <!-- Name -->
           <div>
-            <label class="block text-sm font-medium text-slate-300 mb-1">Name</label>
+            <label class="block text-sm font-medium text-text-secondary mb-1">Name</label>
             <input
               v-model="form.name"
               type="text"
               required
-              class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 placeholder-slate-500"
+              class="w-full bg-elevated border border-border rounded-md px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 placeholder-text-tertiary"
               placeholder="My Radarr"
             />
           </div>
 
           <!-- Type -->
           <div>
-            <label class="block text-sm font-medium text-slate-300 mb-1">Type</label>
+            <label class="block text-sm font-medium text-text-secondary mb-1">Type</label>
             <select
               v-model="form.type"
               required
-              class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
+              class="w-full bg-elevated border border-border rounded-md px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
             >
               <option value="" disabled>Select type...</option>
               <option value="radarr">Radarr</option>
@@ -45,14 +45,14 @@
 
           <!-- Host -->
           <div>
-            <label class="block text-sm font-medium text-slate-300 mb-1">
+            <label class="block text-sm font-medium text-text-secondary mb-1">
               {{ isPlex ? 'Plex Server URL' : 'Host' }}
             </label>
             <input
               v-model="form.host"
               type="text"
               required
-              class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 placeholder-slate-500"
+              class="w-full bg-elevated border border-border rounded-md px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 placeholder-text-tertiary"
               :placeholder="isPlex ? 'http://plex:32400' : 'http://radarr:7878'"
             />
             <p v-if="hostError" class="mt-1 text-xs text-danger">{{ hostError }}</p>
@@ -60,19 +60,19 @@
 
           <!-- API Key / Plex Token -->
           <div v-if="!isPlex">
-            <label class="block text-sm font-medium text-slate-300 mb-1">API Key</label>
+            <label class="block text-sm font-medium text-text-secondary mb-1">API Key</label>
             <div class="relative">
               <input
                 v-model="form.api_key"
                 :type="showKey ? 'text' : 'password'"
                 required
-                class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 placeholder-slate-500 pr-10"
+                class="w-full bg-elevated border border-border rounded-md px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 placeholder-text-tertiary pr-10"
                 placeholder="Your API key"
               />
               <button
                 type="button"
                 @click="showKey = !showKey"
-                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-200"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-text-secondary hover:text-text-primary"
               >
                 <svg v-if="!showKey" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -87,7 +87,7 @@
 
           <!-- Plex Auth Section -->
           <div v-if="isPlex" class="space-y-3">
-            <label class="block text-sm font-medium text-slate-300">Plex Token</label>
+            <label class="block text-sm font-medium text-text-secondary">Plex Token</label>
 
             <!-- Sign in with Plex button -->
             <button
@@ -95,7 +95,7 @@
               type="button"
               @click="startPlexAuth"
               :disabled="plexAuthLoading"
-              class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-warning hover:bg-amber-600 text-base font-medium text-sm transition-base disabled:opacity-50"
+              class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-warning hover:bg-warning/80 text-ink font-medium text-sm transition-base disabled:opacity-50"
             >
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1.41-1.41L14.17 11H8V9h8v2l-5 6z"/>
@@ -113,12 +113,12 @@
             </div>
 
             <!-- Token acquired -->
-            <div v-if="plexToken" class="flex items-center gap-2 p-2 rounded-md bg-accent/10 border border-accent/30">
+            <div v-if="plexToken" class="flex items-center gap-2 p-2 rounded-md bg-accent-muted border border-accent/30">
               <svg class="w-4 h-4 text-accent shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               <span class="text-sm text-accent">Connected as <strong>{{ plexUsername }}</strong></span>
-              <button type="button" @click="clearPlexToken" class="ml-auto text-xs text-slate-400 hover:text-danger">Disconnect</button>
+              <button type="button" @click="clearPlexToken" class="ml-auto text-xs text-text-secondary hover:text-danger">Disconnect</button>
             </div>
 
             <!-- Manual token entry toggle -->
@@ -126,7 +126,7 @@
               v-if="!plexToken && !plexAuthLoading"
               type="button"
               @click="plexManualEntry = !plexManualEntry"
-              class="text-xs text-slate-400 hover:text-slate-300 underline"
+              class="text-xs text-text-secondary hover:text-text-primary underline"
             >
               {{ plexManualEntry ? 'Hide manual entry' : 'Or enter token manually' }}
             </button>
@@ -136,21 +136,21 @@
               <input
                 v-model="form.api_key"
                 type="text"
-                class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 placeholder-slate-500"
+                class="w-full bg-elevated border border-border rounded-md px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 placeholder-text-tertiary"
                 placeholder="X-Plex-Token"
               />
-              <p class="mt-1 text-xs text-slate-500">Find your token at plex.tv → Account → Authorized devices</p>
+              <p class="mt-1 text-xs text-text-tertiary">Find your token at plex.tv → Account → Authorized devices</p>
             </div>
           </div>
 
           <!-- Path Prefix -->
           <div>
-            <label class="block text-sm font-medium text-slate-300 mb-1">Path Prefix</label>
+            <label class="block text-sm font-medium text-text-secondary mb-1">Path Prefix</label>
             <input
               v-model="form.path_prefix"
               type="text"
               required
-              class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 placeholder-slate-500"
+              class="w-full bg-elevated border border-border rounded-md px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 placeholder-text-tertiary"
               :placeholder="isPlex ? '/etc/komodo/stacks/plex' : '/etc/komodo/stacks/arr/radarr'"
             />
           </div>
@@ -186,13 +186,13 @@
             <button
               type="button"
               @click="$emit('cancel')"
-              class="px-3 py-1.5 text-sm font-medium text-slate-300 bg-elevated rounded-md hover:bg-slate-700 transition-base"
+              class="px-3 py-1.5 text-sm font-medium text-text-secondary bg-elevated rounded-md hover:bg-highlight transition-base"
             >
               Cancel
             </button>
             <button
               type="submit"
-              class="px-3 py-1.5 text-sm font-medium text-base bg-accent rounded-md hover:bg-accent-hover transition-base disabled:opacity-50"
+              class="px-3 py-1.5 text-sm font-medium text-ink bg-accent rounded-md hover:bg-accent-hover transition-base disabled:opacity-50"
               :disabled="!isValid"
             >
               {{ isEdit ? 'Save Changes' : 'Add Instance' }}
@@ -260,9 +260,9 @@ const canTest = computed(() => {
 })
 
 const testStatusClass = computed(() => {
-  if (testing.value) return 'bg-elevated text-slate-300 cursor-wait'
-  if (testResult.value === null) return 'bg-elevated text-slate-300 hover:bg-slate-700'
-  if (testResult.value.success) return 'bg-accent/20 text-accent'
+  if (testing.value) return 'bg-elevated text-text-secondary cursor-wait'
+  if (testResult.value === null) return 'bg-elevated text-text-secondary hover:bg-highlight'
+  if (testResult.value.success) return 'bg-accent-muted text-accent'
   return 'bg-danger/20 text-danger'
 })
 

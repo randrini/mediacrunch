@@ -6,29 +6,29 @@
         <div class="flex items-center space-x-3">
           <button
             @click="router.push('/instances')"
-            class="text-slate-500 hover:text-slate-200 transition-base"
+            class="text-text-tertiary hover:text-text-primary transition-base"
           >
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
           <div class="min-w-0">
-            <h1 class="text-lg font-bold text-slate-100 truncate">{{ instance.name }}</h1>
+            <h1 class="text-2xl font-bold text-text-primary truncate tracking-tight">{{ instance.name }}</h1>
             <div class="flex items-center flex-wrap gap-2 mt-1">
               <span
-                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium"
                 :class="typeBadgeClass"
               >
                 {{ instance.type }}
               </span>
-              <span class="text-xs text-slate-500 truncate">{{ instance.host }}</span>
+              <span class="text-xs text-text-tertiary truncate">{{ instance.host }}</span>
             </div>
           </div>
         </div>
         <div class="flex items-center flex-wrap gap-2">
           <button
             @click="openCleanupModal"
-            class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-elevated text-slate-300 hover:bg-slate-700 hover:text-slate-100 transition-base border border-white/[0.06]"
+            class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-elevated text-text-secondary hover:bg-highlight hover:text-text-primary transition-base border border-border"
             title="Clean up .bak files"
           >
             <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -38,7 +38,7 @@
           </button>
           <button
             @click="handleScan"
-            class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-accent text-white hover:bg-accent-hover transition-base"
+            class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-accent text-ink hover:bg-accent-hover transition-base"
           >
             <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -65,17 +65,17 @@
     <!-- Active compression job indicator -->
     <div
       v-if="currentJob && (currentJob.status === 'pending' || currentJob.status === 'running')"
-      class="bg-sky-900/20 border border-sky-700/30 rounded-lg px-3 py-2 mb-4"
+      class="bg-accent-muted border border-accent/30 rounded-md px-3 py-2 mb-4"
     >
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div class="flex items-center space-x-3">
-          <svg class="animate-spin h-5 w-5 text-sky-400" fill="none" viewBox="0 0 24 24">
+          <svg class="animate-spin h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
           <div>
-            <p class="text-sm text-sky-200 font-medium">Compression in progress...</p>
-            <p class="text-xs text-sky-300/70">
+            <p class="text-sm text-accent font-medium">Compression in progress...</p>
+            <p class="text-xs text-text-secondary">
               {{ currentJob.processed_items }}/{{ currentJob.total_items }} items
               <span v-if="currentJob.total_images > 0">
                 &middot; {{ currentJob.processed_images }}/{{ currentJob.total_images }} images
@@ -86,7 +86,7 @@
         </div>
         <button
           @click="cancelCurrentJob"
-          class="text-sm text-danger hover:text-red-400 underline self-start sm:self-auto"
+          class="text-sm text-danger hover:text-danger/80 underline self-start sm:self-auto"
         >
           Cancel
         </button>
@@ -94,7 +94,7 @@
       <!-- Progress bar -->
       <div class="mt-2 w-full bg-elevated rounded-full h-1.5">
         <div
-          class="bg-sky-500 h-1.5 rounded-full transition-all duration-500"
+          class="bg-accent h-1.5 rounded-full transition-all duration-500"
           :style="{ width: progressPercent + '%' }"
         />
       </div>
@@ -138,45 +138,45 @@
       >
         <div class="absolute inset-0 bg-base/80 backdrop-blur-md" @click="showCompressModal = false" />
         <div class="relative card-glass w-full max-w-md mx-4 p-5">
-          <h3 class="text-lg font-semibold text-slate-100 mb-4">Compress Settings</h3>
+          <h3 class="text-lg font-semibold text-text-primary mb-4">Compress Settings</h3>
 
           <div class="space-y-5">
             <!-- Section 1: Defaults -->
             <div>
-              <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Defaults</h4>
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-text-tertiary mb-3">Defaults</h4>
               <div class="space-y-3">
                 <!-- Quality -->
                 <div>
-                  <label class="block text-sm font-medium text-slate-300 mb-1">Quality</label>
+                  <label class="block text-sm font-medium text-text-secondary mb-1">Quality</label>
                   <input
                     v-model.number="compressConfig.quality.default"
                     type="number"
                     min="1"
                     max="100"
-                    class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
+                    class="w-full bg-elevated border border-border rounded-md px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
                   />
                 </div>
 
                 <!-- Max Width -->
                 <div>
-                  <label class="block text-sm font-medium text-slate-300 mb-1">Max Width</label>
+                  <label class="block text-sm font-medium text-text-secondary mb-1">Max Width</label>
                   <input
                     v-model.number="compressConfig.max_width.default"
                     type="number"
                     min="100"
                     step="100"
-                    class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
+                    class="w-full bg-elevated border border-border rounded-md px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
                   />
                 </div>
 
                 <!-- Min Saving -->
                 <div>
-                  <label class="block text-sm font-medium text-slate-300 mb-1">Min Saving (KB)</label>
+                  <label class="block text-sm font-medium text-text-secondary mb-1">Min Saving (KB)</label>
                   <input
                     v-model.number="compressConfig.min_saving_kb"
                     type="number"
                     min="0"
-                    class="w-full bg-elevated border border-white/[0.08] rounded-md px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
+                    class="w-full bg-elevated border border-border rounded-md px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50"
                   />
                 </div>
               </div>
@@ -188,7 +188,7 @@
                 <button
                   type="button"
                   @click="showRoleOverrides = !showRoleOverrides"
-                  class="group flex items-center text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-accent transition-base"
+                  class="group flex items-center text-xs font-semibold uppercase tracking-wider text-text-tertiary hover:text-accent transition-base"
                 >
                   <svg
                     class="w-3.5 h-3.5 mr-1.5 transition-transform duration-200"
@@ -207,7 +207,7 @@
                   type="button"
                   @click="roleSyncLocked = !roleSyncLocked"
                   class="inline-flex items-center space-x-1.5 text-xs font-medium transition-base"
-                  :class="roleSyncLocked ? 'text-accent' : 'text-slate-500 hover:text-slate-300'"
+                  :class="roleSyncLocked ? 'text-accent' : 'text-text-tertiary hover:text-text-secondary'"
                   :title="roleSyncLocked ? 'Locked: all roles sync to default values. Click to unlock per-role customization.' : 'Unlocked: per-role values are independent. Click to sync all roles to defaults.'"
                 >
                   <svg v-if="roleSyncLocked" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -224,13 +224,13 @@
                 <div
                   v-for="role in ROLE_ORDER"
                   :key="role"
-                  class="bg-elevated/60 border border-white/[0.06] rounded-lg p-3"
+                  class="bg-elevated border border-border rounded-md p-3"
                   :class="{ 'opacity-60': roleSyncLocked }"
                 >
                   <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm font-medium text-slate-200">{{ ROLE_LABELS[role] }}</span>
-                    <span class="inline-flex items-center text-[11px] font-medium text-slate-400 bg-base px-2 py-0.5 rounded">
-                      <svg class="w-3 h-3 mr-1 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <span class="text-sm font-medium text-text-primary">{{ ROLE_LABELS[role] }}</span>
+                    <span class="inline-flex items-center text-[11px] font-medium text-text-secondary bg-base px-2 py-0.5 rounded-sm">
+                      <svg class="w-3 h-3 mr-1 text-text-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                       </svg>
                       Skip if < {{ MIN_SIZES[role] }} KB
@@ -238,25 +238,25 @@
                   </div>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label class="block text-xs text-slate-500 mb-1">Quality</label>
+                      <label class="block text-xs text-text-tertiary mb-1">Quality</label>
                       <input
                         v-model.number="compressConfig.quality[role]"
                         type="number"
                         min="1"
                         max="100"
                         :disabled="roleSyncLocked"
-                        class="w-full bg-base border border-white/[0.08] rounded-md px-2.5 py-1.5 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="w-full bg-base border border-border rounded-md px-2.5 py-1.5 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                     <div>
-                      <label class="block text-xs text-slate-500 mb-1">Max Width</label>
+                      <label class="block text-xs text-text-tertiary mb-1">Max Width</label>
                       <input
                         v-model.number="compressConfig.max_width[role]"
                         type="number"
                         min="100"
                         step="100"
                         :disabled="roleSyncLocked"
-                        class="w-full bg-base border border-white/[0.08] rounded-md px-2.5 py-1.5 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="w-full bg-base border border-border rounded-md px-2.5 py-1.5 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -266,16 +266,16 @@
 
             <!-- Section 3: Options -->
             <div>
-              <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Options</h4>
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-text-tertiary mb-3">Options</h4>
               <div class="space-y-3">
                 <!-- Backup toggle -->
                 <label class="flex items-center space-x-3 cursor-pointer">
                   <input
                     v-model="compressConfig.backup"
                     type="checkbox"
-                    class="rounded border-white/[0.08] bg-elevated text-accent focus:ring-accent/50"
+                    class="rounded-sm border-border-strong bg-elevated text-accent focus:ring-accent/50"
                   />
-                  <span class="text-sm text-slate-300">Create backup before compressing</span>
+                  <span class="text-sm text-text-secondary">Create backup before compressing</span>
                 </label>
 
                 <!-- Lock Plex toggle -->
@@ -283,9 +283,9 @@
                   <input
                     v-model="compressConfig.lock_plex"
                     type="checkbox"
-                    class="rounded border-white/[0.08] bg-elevated text-accent focus:ring-accent/50"
+                    class="rounded-sm border-border-strong bg-elevated text-accent focus:ring-accent/50"
                   />
-                  <span class="text-sm text-slate-300">Lock Plex metadata fields</span>
+                  <span class="text-sm text-text-secondary">Lock Plex metadata fields</span>
                 </label>
 
                 <!-- Re-compress toggle -->
@@ -293,11 +293,11 @@
                   <input
                     v-model="compressConfig.recompress"
                     type="checkbox"
-                    class="rounded border-white/[0.08] bg-elevated text-accent focus:ring-accent/50"
+                    class="rounded-sm border-border-strong bg-elevated text-accent focus:ring-accent/50"
                   />
                   <div>
-                    <span class="text-sm text-slate-300">Re-compress already compressed items</span>
-                    <p v-if="compressConfig.recompress" class="text-xs text-amber-400 mt-0.5">
+                    <span class="text-sm text-text-secondary">Re-compress already compressed items</span>
+                    <p v-if="compressConfig.recompress" class="text-xs text-warning mt-0.5">
                       ⚠️ Re-compression may reduce quality further. Use only if you want to apply new settings.
                     </p>
                   </div>
@@ -309,14 +309,14 @@
           <div class="flex justify-end space-x-3 mt-4">
             <button
               @click="showCompressModal = false"
-              class="px-3 py-1.5 text-sm font-medium text-slate-300 bg-elevated rounded-md hover:bg-slate-700 transition-base"
+              class="px-3 py-1.5 text-sm font-medium text-text-secondary bg-elevated rounded-md hover:bg-highlight transition-base"
             >
               Cancel
             </button>
             <button
               @click="startCompression"
               :disabled="compressLoading"
-              class="px-3 py-1.5 text-sm font-medium text-white bg-accent rounded-md hover:bg-accent-hover transition-base disabled:opacity-50"
+              class="px-3 py-1.5 text-sm font-medium text-ink bg-accent rounded-md hover:bg-accent-hover transition-base disabled:opacity-50"
             >
               {{ compressLoading ? 'Starting...' : 'Start Compression' }}
             </button>
@@ -336,22 +336,22 @@
       >
         <div class="absolute inset-0 bg-base/80 backdrop-blur-md" @click="showCleanupModal = false" />
         <div class="relative card-glass w-full max-w-md mx-4 p-5">
-          <h3 class="text-lg font-semibold text-slate-100 mb-4">Clean Up Backup Files</h3>
+          <h3 class="text-lg font-semibold text-text-primary mb-4">Clean Up Backup Files</h3>
 
           <!-- Idle state -->
           <div v-if="cleanupState === 'idle'" class="space-y-4">
-            <p class="text-sm text-slate-300">This will scan and delete .bak files from your metadata directories. These are backup files created by Plex and previous versions of MediaCrunch.</p>
-            <p class="text-xs text-slate-500">This action cannot be undone.</p>
+            <p class="text-sm text-text-secondary">This will scan and delete .bak files from your metadata directories. These are backup files created by Plex and previous versions of MediaCrunch.</p>
+            <p class="text-xs text-text-tertiary">This action cannot be undone.</p>
             <div class="flex justify-end space-x-3">
               <button
                 @click="showCleanupModal = false"
-                class="px-3 py-1.5 text-sm font-medium text-slate-300 bg-elevated rounded-md hover:bg-slate-700 transition-base"
+                class="px-3 py-1.5 text-sm font-medium text-text-secondary bg-elevated rounded-md hover:bg-highlight transition-base"
               >
                 Cancel
               </button>
               <button
                 @click="previewCleanup"
-                class="px-3 py-1.5 text-sm font-medium text-white bg-accent rounded-md hover:bg-accent-hover transition-base"
+                class="px-3 py-1.5 text-sm font-medium text-ink bg-accent rounded-md hover:bg-accent-hover transition-base"
               >
                 Preview
               </button>
@@ -364,34 +364,34 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
-            <p class="text-sm text-slate-300 mt-3">Scanning for backup files...</p>
+            <p class="text-sm text-text-secondary mt-3">Scanning for backup files...</p>
           </div>
 
           <!-- Preview results state -->
           <div v-else-if="cleanupState === 'preview'" class="space-y-4">
-            <div class="bg-elevated rounded-lg p-4 text-center">
-              <p class="text-2xl font-bold text-slate-100">{{ cleanupResult.deleted_files }}</p>
-              <p class="text-xs text-slate-400">.bak files found</p>
+            <div class="bg-elevated rounded-md p-4 text-center">
+              <p class="text-2xl font-bold text-text-primary">{{ cleanupResult.deleted_files }}</p>
+              <p class="text-xs text-text-secondary">.bak files found</p>
               <p class="text-lg font-semibold text-accent mt-1">{{ formatBytes(cleanupResult.freed_bytes) }}</p>
-              <p class="text-xs text-slate-400">disk space to free</p>
+              <p class="text-xs text-text-secondary">disk space to free</p>
             </div>
-            <div v-if="cleanupResult.errors.length > 0" class="bg-danger/10 border border-danger/20 rounded p-3">
+            <div v-if="cleanupResult.errors.length > 0" class="bg-danger/10 border border-danger/20 rounded-sm p-3">
               <p class="text-xs text-danger">{{ cleanupResult.errors.length }} files could not be accessed</p>
             </div>
             <div v-if="cleanupResult.deleted_files === 0" class="text-center">
-              <p class="text-sm text-slate-400">No backup files found.</p>
+              <p class="text-sm text-text-secondary">No backup files found.</p>
             </div>
             <div class="flex justify-end space-x-3">
               <button
                 @click="showCleanupModal = false"
-                class="px-3 py-1.5 text-sm font-medium text-slate-300 bg-elevated rounded-md hover:bg-slate-700 transition-base"
+                class="px-3 py-1.5 text-sm font-medium text-text-secondary bg-elevated rounded-md hover:bg-highlight transition-base"
               >
                 Cancel
               </button>
               <button
                 v-if="cleanupResult.deleted_files > 0"
                 @click="executeCleanup"
-                class="px-3 py-1.5 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-base"
+                class="px-3 py-1.5 text-sm font-medium text-ink bg-danger rounded-md hover:bg-danger/80 transition-base"
               >
                 Delete All
               </button>
@@ -400,25 +400,25 @@
 
           <!-- Deleting state (spinner) -->
           <div v-else-if="cleanupState === 'deleting'" class="text-center py-6">
-            <svg class="animate-spin h-8 w-8 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24">
+            <svg class="animate-spin h-8 w-8 text-danger mx-auto" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
-            <p class="text-sm text-slate-300 mt-3">Deleting backup files...</p>
+            <p class="text-sm text-text-secondary mt-3">Deleting backup files...</p>
           </div>
 
           <!-- Done state -->
           <div v-else-if="cleanupState === 'done'" class="space-y-4">
-            <div class="bg-accent/10 border border-accent/20 rounded-lg p-4 text-center">
-              <p class="text-2xl font-bold text-slate-100">{{ cleanupResult.deleted_files }}</p>
-              <p class="text-xs text-slate-400">files deleted</p>
+            <div class="bg-accent-muted border border-accent/20 rounded-md p-4 text-center">
+              <p class="text-2xl font-bold text-text-primary">{{ cleanupResult.deleted_files }}</p>
+              <p class="text-xs text-text-secondary">files deleted</p>
               <p class="text-lg font-semibold text-accent mt-1">{{ formatBytes(cleanupResult.freed_bytes) }}</p>
-              <p class="text-xs text-slate-400">disk space freed</p>
+              <p class="text-xs text-text-secondary">disk space freed</p>
             </div>
             <div class="flex justify-end">
               <button
                 @click="showCleanupModal = false"
-                class="px-3 py-1.5 text-sm font-medium text-slate-300 bg-elevated rounded-md hover:bg-slate-700 transition-base"
+                class="px-3 py-1.5 text-sm font-medium text-text-secondary bg-elevated rounded-md hover:bg-highlight transition-base"
               >
                 Close
               </button>
@@ -431,7 +431,7 @@
             <div class="flex justify-end">
               <button
                 @click="showCleanupModal = false"
-                class="px-3 py-1.5 text-sm font-medium text-slate-300 bg-elevated rounded-md hover:bg-slate-700 transition-base"
+                class="px-3 py-1.5 text-sm font-medium text-text-secondary bg-elevated rounded-md hover:bg-highlight transition-base"
               >
                 Close
               </button>
@@ -545,10 +545,10 @@ const progressPercent = computed(() => {
 
 const typeBadgeClass = computed(() => {
   switch (instance.value?.type) {
-    case 'radarr': return 'bg-sky-900/30 text-sky-300'
-    case 'sonarr': return 'bg-violet-900/30 text-violet-300'
-    case 'plex': return 'bg-orange-900/30 text-orange-400'
-    default: return 'bg-elevated text-slate-300'
+    case 'radarr': return 'bg-accent-muted text-accent border border-accent/30'
+    case 'sonarr': return 'bg-accent-muted text-accent border border-accent/30'
+    case 'plex': return 'bg-accent-muted text-accent border border-accent/30'
+    default: return 'bg-elevated text-text-secondary border border-border'
   }
 })
 
