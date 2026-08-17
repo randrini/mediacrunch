@@ -15,6 +15,7 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/google/uuid"
 
+	"github.com/mediacrunch/mediacrunch/internal/cache"
 	"github.com/mediacrunch/mediacrunch/internal/clients"
 	"github.com/mediacrunch/mediacrunch/internal/db"
 	"github.com/mediacrunch/mediacrunch/internal/logger"
@@ -26,11 +27,12 @@ import (
 type Compressor struct {
 	DB     *db.DB
 	Logger *logger.Logger
+	Cache  *cache.Cache
 }
 
 // NewCompressor creates a new Compressor.
-func NewCompressor(database *db.DB, log *logger.Logger) *Compressor {
-	return &Compressor{DB: database, Logger: log}
+func NewCompressor(database *db.DB, log *logger.Logger, c *cache.Cache) *Compressor {
+	return &Compressor{DB: database, Logger: log, Cache: c}
 }
 
 // RunCompressionJob processes a compression job asynchronously.
@@ -98,6 +100,13 @@ func (c *Compressor) RunCompressionJob(ctx context.Context, job *models.Compress
 	now2 := time.Now()
 	job.CompletedAt = &now2
 	c.updateJob(job)
+
+	// Invalidate caches so the UI shows updated sizes and compressed status
+	if c.Cache != nil {
+		c.Cache.Invalidate("media:" + job.InstanceID)
+		c.Cache.Invalidate("stats:" + job.InstanceID)
+	}
+
 	c.Logger.Infof("compressor", job.InstanceID, "Compression completed: %d items, %d images, saved %s", job.ProcessedItems, job.ProcessedImages, models.FormatSize(job.SavedBytes))
 }
 

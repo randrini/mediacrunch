@@ -75,11 +75,11 @@ type MediaItem struct {
 	Compressed      bool        `json:"compressed"`
 	Locked          *bool       `json:"locked,omitempty"` // plex only
 	ScannedAt       *time.Time  `json:"scanned_at,omitempty"`
-	PosterSize      int64       `json:"poster_size,omitempty"`
-	FanartSize      int64       `json:"fanart_size,omitempty"`
-	ClearLogoSize   int64       `json:"clear_logo_size,omitempty"`
-	SeasonPosterSize int64      `json:"season_poster_size,omitempty"`
-	BannerSize      int64       `json:"banner_size,omitempty"`
+	PosterSize      int64       `json:"poster_size"`
+	FanartSize      int64       `json:"fanart_size"`
+	ClearLogoSize   int64       `json:"clear_logo_size"`
+	SeasonPosterSize int64      `json:"season_poster_size"`
+	BannerSize      int64       `json:"banner_size"`
 }
 
 // ComputeRoleSizes sums the size of every image per role into the per-role
@@ -89,7 +89,7 @@ func (item *MediaItem) ComputeRoleSizes() {
 		switch img.Role {
 		case "poster":
 			item.PosterSize += img.SizeBytes
-		case "fanart":
+		case "fanart", "art":
 			item.FanartSize += img.SizeBytes
 		case "clearLogo":
 			item.ClearLogoSize += img.SizeBytes

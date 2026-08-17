@@ -58,7 +58,7 @@ func NewRouter(database *db.DB) *gin.Engine {
 	cacheStore := cache.New(5 * time.Minute)
 	log := logger.NewLogger(database.DB)
 	scannerDispatcher := scanner.NewDispatcher(database, log)
-	comp := compressor.NewCompressor(database, log)
+	comp := compressor.NewCompressor(database, log, cacheStore)
 
 	instanceHandler := NewInstanceHandler(database, scannerDispatcher, cacheStore)
 	mediaHandler := NewMediaHandler(database, cacheStore)

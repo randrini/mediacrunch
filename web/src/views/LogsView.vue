@@ -223,6 +223,7 @@ const showClearConfirm = ref(false)
 const expandedIds = ref<Set<number>>(new Set())
 const instanceStore = useInstancesStore()
 let pollTimer: ReturnType<typeof setInterval> | null = null
+let fetchId = 0
 
 const levels = [
   { label: 'All', value: 'all' },
@@ -241,6 +242,7 @@ const instanceMap = computed(() => {
 })
 
 async function fetchLogs() {
+  const currentFetchId = ++fetchId
   loading.value = true
   error.value = null
   try {
@@ -251,12 +253,16 @@ async function fetchLogs() {
     if (activeLevel.value !== 'all') params.level = activeLevel.value
     if (searchQuery.value) params.search = searchQuery.value
     const res = await getLogs(params)
+    if (currentFetchId !== fetchId) return // stale response, discard
     logs.value = res.logs
     total.value = res.total
   } catch (e: any) {
+    if (currentFetchId !== fetchId) return
     error.value = e?.response?.data?.error || e?.message || 'Failed to fetch logs'
   } finally {
-    loading.value = false
+    if (currentFetchId === fetchId) {
+      loading.value = false
+    }
   }
 }
 
@@ -294,12 +300,23 @@ function prevPage() {
 }
 
 async function handleClearLogs() {
+  // Pause polling during clear to prevent stale responses from resurrecting logs
+  if (pollTimer) {
+    clearInterval(pollTimer)
+    pollTimer = null
+  }
   try {
     await clearLogs()
     showClearConfirm.value = false
-    fetchLogs()
+    // Increment fetchId to discard any in-flight poll response
+    fetchId++
+    await fetchLogs()
   } catch (e: any) {
     error.value = e?.response?.data?.error || e?.message || 'Failed to clear logs'
+  }
+  // Restart live polling if still on first page with no filters
+  if (isLive.value) {
+    pollTimer = setInterval(fetchLogs, 5000)
   }
 }
 
