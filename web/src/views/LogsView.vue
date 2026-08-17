@@ -146,7 +146,19 @@
                 @click="toggleExpand(entry.id)"
                 class="text-[11px] text-text-tertiary hover:text-text-secondary transition-base font-mono"
               >
-                {{ expandedIds.has(entry.id) ? '▲ Hide details' : '▼ Show details' }}
+                <span class="inline-flex items-center">
+                  <svg
+                    class="w-3 h-3 mr-1 transition-transform duration-150"
+                    :class="expandedIds.has(entry.id) ? 'rotate-180' : ''"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                  {{ expandedIds.has(entry.id) ? 'Hide details' : 'Show details' }}
+                </span>
               </button>
               <div
                 v-if="expandedIds.has(entry.id)"
@@ -311,7 +323,7 @@ function sourceClass(source: string): string {
     case 'scanner': return 'bg-accent-muted text-accent border border-accent/40'
     case 'compressor': return 'bg-success/10 text-success border border-success/20'
     case 'api': return 'bg-highlight text-text-secondary border border-border'
-    case 'system': return 'bg-highlight text-text-tertiary border border-border'
+    case 'system': return 'bg-highlight text-text-secondary border border-border'
     default: return 'bg-highlight text-text-tertiary border border-border'
   }
 }

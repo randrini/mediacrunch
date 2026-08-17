@@ -1,6 +1,6 @@
 <template>
   <div
-    class="card-glass p-3.5 hover:border-border-strong hover:scale-[1.01] transition-all duration-150 cursor-pointer"
+    class="card-glass p-3.5 hover:border-border-strong transition-all duration-150 cursor-pointer"
     :class="accentBorder"
     @click="$emit('viewMedia', instance.id)"
   >
@@ -25,8 +25,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-          <div>
-            <h3 class="text-sm font-semibold text-text-primary hover:text-accent transition-base">{{ instance.name }}</h3>
+        <div>
+          <h3 class="text-sm font-semibold text-text-primary hover:text-accent transition-base">{{ instance.name }}</h3>
           <span
             class="inline-flex items-center px-1.5 py-0.5 rounded-sm text-[10px] font-mono font-medium mt-0.5"
             :class="typeBadgeClass"

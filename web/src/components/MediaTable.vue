@@ -150,7 +150,31 @@
                 />
               </td>
               <td class="px-2 py-1 whitespace-nowrap">
-                <span class="text-lg" :title="item.media_type">{{ typeIcon(item.media_type) }}</span>
+                <span class="inline-flex items-center justify-center text-text-secondary" :title="item.media_type">
+                  <svg v-if="typeIcon(item.media_type) === 'movie'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="5" width="18" height="14" rx="1" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 5v14M17 5v14M3 9h4M3 15h4M17 9h4M17 15h4" />
+                  </svg>
+                  <svg v-else-if="typeIcon(item.media_type) === 'series'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="13" rx="2" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 2l-5 5-5-5" />
+                  </svg>
+                  <svg v-else-if="typeIcon(item.media_type) === 'season'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 2v4M8 2v4M3 10h18" />
+                  </svg>
+                  <svg v-else-if="typeIcon(item.media_type) === 'episode'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <rect x="4" y="3" width="16" height="18" rx="1" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 9h16M4 15h16" />
+                  </svg>
+                  <svg v-else-if="typeIcon(item.media_type) === 'collection'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
+                  </svg>
+                  <svg v-else class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 2v6h6" />
+                  </svg>
+                </span>
               </td>
               <td class="px-2 py-1">
                 <div class="text-xs font-medium text-text-primary truncate max-w-xs" :title="item.title">
@@ -170,7 +194,7 @@
                     <div class="bg-elevated border border-border-strong rounded-md shadow-lg px-2 py-1 text-xs text-text-primary whitespace-nowrap">
                       <div v-for="img in item.images" :key="img.role" class="py-0.5">
                         <span class="font-medium">{{ img.role }}:</span>
-                        {{ formatBytes(img.size_bytes) }} ({{ img.width }}x{{ img.height }})
+                        <span class="font-mono">{{ formatBytes(img.size_bytes) }} ({{ img.width }}x{{ img.height }})</span>
                       </div>
                     </div>
                   </div>
@@ -197,12 +221,12 @@
                 <span v-else class="text-text-tertiary">—</span>
               </td>
               <td class="px-2 py-1 whitespace-nowrap">
-                <span :class="sizeBadgeClass(item.compressed && item.original_size > 0 ? item.original_size : item.total_size)" class="font-mono">
+                <span :class="sizeBadgeClass(item.compressed && item.original_size > 0 ? item.original_size : item.total_size)">
                   {{ formatBytes(item.compressed && item.original_size > 0 ? item.original_size : item.total_size) }}
                 </span>
               </td>
               <td class="px-2 py-1 whitespace-nowrap">
-                <span v-if="item.compressed && item.original_size > 0" class="size-badge-small font-mono">
+                <span v-if="item.compressed && item.original_size > 0" class="size-badge-small">
                   {{ formatBytes(item.total_size) }}
                 </span>
                 <span v-else class="text-text-tertiary text-xs">—</span>
@@ -210,7 +234,7 @@
               <td class="px-2 py-1 whitespace-nowrap">
                 <span v-if="item.compressed && item.original_size > 0" class="text-xs font-medium text-accent font-mono">
                   −{{ formatBytes(item.original_size - item.total_size) }}
-                  <span class="text-[11px] text-text-tertiary">({{ Math.round((1 - item.total_size / item.original_size) * 100) }}%)</span>
+                  <span class="text-[11px] text-text-tertiary">(<span class="font-mono">{{ Math.round((1 - item.total_size / item.original_size) * 100) }}%</span>)</span>
                 </span>
                 <span v-else class="text-text-tertiary text-xs">—</span>
               </td>
@@ -295,7 +319,31 @@
 
         <!-- Title + type + year -->
         <div class="flex items-start gap-2 pr-8">
-          <span class="text-lg leading-none" :title="item.media_type">{{ typeIcon(item.media_type) }}</span>
+          <span class="inline-flex items-center justify-center text-text-secondary" :title="item.media_type">
+            <svg v-if="typeIcon(item.media_type) === 'movie'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="5" width="18" height="14" rx="1" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 5v14M17 5v14M3 9h4M3 15h4M17 9h4M17 15h4" />
+            </svg>
+            <svg v-else-if="typeIcon(item.media_type) === 'series'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="13" rx="2" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 2l-5 5-5-5" />
+            </svg>
+            <svg v-else-if="typeIcon(item.media_type) === 'season'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 2v4M8 2v4M3 10h18" />
+            </svg>
+            <svg v-else-if="typeIcon(item.media_type) === 'episode'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <rect x="4" y="3" width="16" height="18" rx="1" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 9h16M4 15h16" />
+            </svg>
+            <svg v-else-if="typeIcon(item.media_type) === 'collection'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
+            </svg>
+            <svg v-else class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 2v6h6" />
+            </svg>
+          </span>
           <div class="min-w-0">
             <p class="text-xs font-semibold text-text-primary truncate" :title="item.title">{{ item.title }}</p>
             <p class="text-[11px] text-text-tertiary font-mono mt-0.5">{{ item.year ?? '-' }}</p>
@@ -465,12 +513,12 @@ function sortBy(field: string) {
 
 function typeIcon(type: string): string {
   switch (type) {
-    case 'movie': return '🎬'
-    case 'series': return '📺'
-    case 'season': return '📋'
-    case 'episode': return '🎞️'
-    case 'collection': return '📂'
-    default: return '📄'
+    case 'movie': return 'movie'
+    case 'series': return 'series'
+    case 'season': return 'season'
+    case 'episode': return 'episode'
+    case 'collection': return 'collection'
+    default: return 'file'
   }
 }
 

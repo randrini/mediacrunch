@@ -65,7 +65,7 @@
     <!-- Active compression job indicator -->
     <div
       v-if="currentJob && (currentJob.status === 'pending' || currentJob.status === 'running')"
-      class="bg-accent-muted border border-accent/40 rounded-md px-3 py-2 mb-4"
+      class="bg-accent-muted border border-accent/40 rounded-md px-3 py-2 mb-4 safelight-glow"
     >
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div class="flex items-center space-x-3">
@@ -76,11 +76,11 @@
           <div>
             <p class="text-sm text-accent font-medium">Compression in progress...</p>
             <p class="text-xs text-text-secondary">
-              {{ currentJob.processed_items }}/{{ currentJob.total_items }} items
+              <span class="font-mono">{{ currentJob.processed_items }}/{{ currentJob.total_items }}</span> items
               <span v-if="currentJob.total_images > 0">
-                &middot; {{ currentJob.processed_images }}/{{ currentJob.total_images }} images
+                &middot; <span class="font-mono">{{ currentJob.processed_images }}/{{ currentJob.total_images }}</span> images
               </span>
-              &middot; {{ formatBytes(currentJob.saved_bytes) }} saved
+              &middot; <span class="font-mono">{{ formatBytes(currentJob.saved_bytes) }}</span> saved
             </p>
           </div>
         </div>
@@ -94,7 +94,7 @@
       <!-- Progress bar -->
       <div class="mt-2 w-full bg-elevated rounded-full h-1.5">
         <div
-          class="bg-accent h-1.5 rounded-full transition-all duration-500"
+          class="enlarger-bar h-1.5 rounded-full transition-all duration-500"
           :style="{ width: progressPercent + '%' }"
         />
       </div>
@@ -233,7 +233,7 @@
                       <svg class="w-3 h-3 mr-1 text-text-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                       </svg>
-                      Skip if < {{ MIN_SIZES[role] }} KB
+                      Skip if &lt; <span class="font-mono">{{ MIN_SIZES[role] }}</span> KB
                     </span>
                   </div>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -245,7 +245,7 @@
                         min="1"
                         max="100"
                         :disabled="roleSyncLocked"
-                        class="w-full bg-base border border-border rounded-md px-2.5 py-1.5 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="w-full bg-elevated border border-border rounded-md px-2.5 py-1.5 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                     <div>
@@ -256,7 +256,7 @@
                         min="100"
                         step="100"
                         :disabled="roleSyncLocked"
-                        class="w-full bg-base border border-border rounded-md px-2.5 py-1.5 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="w-full bg-elevated border border-border rounded-md px-2.5 py-1.5 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -298,7 +298,10 @@
                   <div>
                     <span class="text-sm text-text-secondary">Re-compress already compressed items</span>
                     <p v-if="compressConfig.recompress" class="text-xs text-warning mt-0.5">
-                      ⚠️ Re-compression may reduce quality further. Use only if you want to apply new settings.
+                      <svg class="w-3.5 h-3.5 inline-block align-text-bottom mr-1 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                      </svg>
+                      Re-compression may reduce quality further. Use only if you want to apply new settings.
                     </p>
                   </div>
                 </label>
@@ -370,9 +373,9 @@
           <!-- Preview results state -->
           <div v-else-if="cleanupState === 'preview'" class="space-y-4">
             <div class="bg-elevated rounded-md p-4 text-center">
-              <p class="text-2xl font-bold text-text-primary">{{ cleanupResult.deleted_files }}</p>
+              <p class="text-2xl font-bold text-text-primary font-mono">{{ cleanupResult.deleted_files }}</p>
               <p class="text-xs text-text-secondary">.bak files found</p>
-              <p class="text-lg font-semibold text-accent mt-1">{{ formatBytes(cleanupResult.freed_bytes) }}</p>
+              <p class="text-lg font-semibold text-accent font-mono mt-1">{{ formatBytes(cleanupResult.freed_bytes) }}</p>
               <p class="text-xs text-text-secondary">disk space to free</p>
             </div>
             <div v-if="cleanupResult.errors.length > 0" class="bg-danger/10 border border-danger/30 rounded-sm p-3">
@@ -410,9 +413,9 @@
           <!-- Done state -->
           <div v-else-if="cleanupState === 'done'" class="space-y-4">
             <div class="bg-accent-muted border border-accent/20 rounded-md p-4 text-center">
-              <p class="text-2xl font-bold text-text-primary">{{ cleanupResult.deleted_files }}</p>
+              <p class="text-2xl font-bold text-text-primary font-mono">{{ cleanupResult.deleted_files }}</p>
               <p class="text-xs text-text-secondary">files deleted</p>
-              <p class="text-lg font-semibold text-accent mt-1">{{ formatBytes(cleanupResult.freed_bytes) }}</p>
+              <p class="text-lg font-semibold text-accent font-mono mt-1">{{ formatBytes(cleanupResult.freed_bytes) }}</p>
               <p class="text-xs text-text-secondary">disk space freed</p>
             </div>
             <div class="flex justify-end">

@@ -53,8 +53,6 @@
       <option :value="'0'">Unlocked</option>
     </select>
 
-
-
     <!-- Clear filters -->
     <button
       @click="clearFilters"

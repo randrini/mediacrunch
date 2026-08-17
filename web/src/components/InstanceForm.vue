@@ -171,8 +171,18 @@
                 </svg>
                 Testing...
               </span>
-              <span v-else-if="testResult !== null && testResult.success">&#10003; Connection OK</span>
-              <span v-else-if="testResult !== null && !testResult.success">&#10007; Connection Failed</span>
+              <span v-else-if="testResult !== null && testResult.success" class="inline-flex items-center">
+                <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Connection OK
+              </span>
+              <span v-else-if="testResult !== null && !testResult.success" class="inline-flex items-center">
+                <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Connection Failed
+              </span>
               <span v-else>Test Connection</span>
             </button>
             <p v-if="testResult && !testResult.success" class="mt-1 text-xs text-danger">{{ testResult.message }}</p>

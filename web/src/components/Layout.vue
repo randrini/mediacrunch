@@ -11,8 +11,12 @@
           <!-- Left: Brand + Nav Links -->
           <div class="flex items-center space-x-6">
             <router-link to="/" class="flex items-center space-x-2 group">
+              <!-- Aperture / diaphragm brand mark -->
               <svg class="w-6 h-6 text-accent transition-base group-hover:scale-105" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <circle cx="12" cy="12" r="9" />
+                <circle cx="12" cy="12" r="4.5" />
+                <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
+                <path d="M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" />
               </svg>
               <span class="text-sm font-bold text-text-primary tracking-tight font-mono">MediaCrunch</span>
             </router-link>

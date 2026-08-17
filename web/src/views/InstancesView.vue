@@ -31,8 +31,11 @@
 
     <!-- Empty State -->
     <div v-else-if="store.instances.length === 0" class="text-center py-16">
-      <svg class="w-16 h-16 mx-auto text-text-tertiary mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      <svg class="w-16 h-16 mx-auto text-text-tertiary mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="4.5" />
+        <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
+        <path d="M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" />
       </svg>
       <h2 class="text-xl font-semibold text-text-secondary mb-2">No instances yet</h2>
       <p class="text-text-tertiary text-sm mb-4">Add your first Radarr, Sonarr, or Plex instance to get started.</p>

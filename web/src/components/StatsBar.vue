@@ -25,7 +25,7 @@
           </svg>
         </div>
         <div>
-          <p class="text-[16px] font-semibold text-warning font-mono tabular-nums">{{ formatBytes(stats.total_size) }}</p>
+          <p class="text-[16px] font-semibold text-text-primary font-mono tabular-nums">{{ formatBytes(stats.total_size) }}</p>
           <p class="text-[10px] text-text-tertiary uppercase tracking-wider">Total Size</p>
         </div>
       </div>
@@ -41,7 +41,7 @@
           </svg>
         </div>
         <div>
-          <p class="text-[16px] font-semibold text-accent font-mono tabular-nums">{{ formatBytes(stats.total_savings) }}</p>
+          <p class="text-[16px] font-semibold text-text-primary font-mono tabular-nums">{{ formatBytes(stats.total_savings) }}</p>
           <p class="text-[10px] text-text-tertiary uppercase tracking-wider">Saved</p>
         </div>
       </div>
@@ -57,7 +57,7 @@
           </svg>
         </div>
         <div>
-          <p class="text-[16px] font-semibold text-success font-mono tabular-nums">{{ savingsPercent }}%</p>
+          <p class="text-[16px] font-semibold text-text-primary font-mono tabular-nums">{{ savingsPercent }}%</p>
           <p class="text-[10px] text-text-tertiary uppercase tracking-wider">Savings</p>
         </div>
       </div>
